@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mission: Financial Freedom — Money Vichara</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04100a;--bg2:#081a0f;--bg3:#0d2418;
+  --panel:#081510;--panel2:#0e2018;
+  --gold:#c9a227;--gold2:#e8c14a;--gold3:#fff5c2;
+  --green:#1aad4e;--green2:#22d460;
+  --red:#e63946;--red2:#ff6b74;
+  --amber:#f4a261;
+  --teal:#52b788;
+  --text:#e0f0e8;--textm:#7aab88;--textd:#3a6647;
+  --border:rgba(201,162,39,.15);--border2:rgba(201,162,39,.35);--border3:rgba(201,162,39,.6);
+  --r:10px;--rs:7px;
+  --font-h:'Orbitron',monospace;--font-b:'Poppins',sans-serif;
+  --trans:all .18s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font-b);
+  font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(26,173,78,.05),transparent 70%);
+}
+
+/* SCROLLBAR — big, visible, gold */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#081510;border-left:1px solid rgba(201,162,39,.1)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:5px;border:2px solid #081510}
+::-webkit-scrollbar-thumb:hover{background:var(--gold2)}
+* { scrollbar-width: thick; scrollbar-color: var(--gold) #081510; }
+
+/* ATMOSPHERE */
+#atm{position:fixed;inset:0;z-index:1;pointer-events:none;transition:all 2s ease}
+body.heat1 #atm{background:rgba(230,57,70,.03)}
+body.heat2 #atm{background:rgba(230,57,70,.08)}
+body.heat3 #atm{background:rgba(230,57,70,.15)}
+body.heat4 #atm{background:rgba(230,57,70,.24);animation:hpulse 2s ease-in-out infinite}
+body.heat5 #atm{background:rgba(230,57,70,.35);animation:hpulse .7s ease-in-out infinite}
+@keyframes hpulse{0%,100%{opacity:1}50%{opacity:.55}}
+body.shake{animation:shk .35s ease-in-out 4}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+.screen{display:none;min-height:100vh;flex-direction:column;position:relative;z-index:2}
+.screen.active{display:flex}
+
+/* ======= HUD ======= */
+#hud{
+  display:none;position:sticky;top:0;z-index:900;
+  background:rgba(4,16,10,.97);border-bottom:2px solid var(--gold);
+  padding:8px 16px;gap:14px;align-items:center;
+  backdrop-filter:blur(10px);
+}
+#hud.on{display:flex}
+.hud-brand{font-family:var(--font-h);font-size:9px;color:var(--gold);letter-spacing:2px;white-space:nowrap;opacity:.8}
+.hud-sep{width:1px;height:32px;background:var(--border2);flex-shrink:0}
+
+/* TIMER — big and dominant */
+#hud-timer{
+  font-family:var(--font-h);font-size:26px;font-weight:900;
+  color:var(--gold2);letter-spacing:3px;min-width:80px;text-align:center;
+  text-shadow:0 0 16px rgba(201,162,39,.5);transition:color .4s;
+}
+#hud-timer.warn{color:var(--amber);text-shadow:0 0 14px rgba(244,162,97,.5)}
+#hud-timer.crit{color:var(--red);text-shadow:0 0 18px rgba(230,57,70,.7);animation:tpulse .5s ease-in-out infinite}
+@keyframes tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* O2 + TEMP bars — BIG and prominent */
+.vital-bars{display:flex;flex-direction:column;gap:6px;min-width:160px}
+.vital-row{display:flex;align-items:center;gap:8px}
+.vital-lbl{
+  font-family:var(--font-h);font-size:10px;letter-spacing:1px;
+  min-width:38px;font-weight:700;
+}
+.vital-lbl.o2-lbl{color:#52e8ff}
+.vital-lbl.tmp-lbl{color:#ff7c3a}
+.vital-track{
+  flex:1;height:16px;background:rgba(255,255,255,.08);
+  border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.1);
+  position:relative;
+}
+.vital-fill{
+  height:100%;border-radius:8px;
+  transition:width 1.2s linear,background 1.5s;
+}
+#o2fill{background:linear-gradient(90deg,#00c8ff,#52e8ff)}
+#tmpfill{background:linear-gradient(90deg,#22d460,#ffaa00)}
+.vital-val{
+  font-family:var(--font-h);font-size:11px;font-weight:700;min-width:36px;text-align:right;
+}
+.vital-val.o2v{color:#52e8ff}
+.vital-val.tmpv{color:#ff7c3a}
+
+/* PROGRESS — just numbers, clean */
+.hud-prog{display:flex;flex-direction:column;align-items:center;gap:2px}
+.hud-prog-nums{
+  font-family:var(--font-h);font-size:22px;font-weight:900;color:var(--gold2);
+  text-shadow:0 0 10px rgba(201,162,39,.3);
+}
+.hud-prog-sub{font-size:9px;color:var(--textm);letter-spacing:1px;white-space:nowrap}
+
+/* FOOTER */
+#footer{
+  position:fixed;bottom:0;left:0;right:0;z-index:600;
+  background:rgba(4,16,10,.97);border-top:1px solid var(--border2);
+  padding:5px 16px;display:flex;align-items:center;justify-content:space-between;
+}
+.fb{font-family:var(--font-h);font-size:9px;color:var(--gold);letter-spacing:2px}
+.fc{font-size:9px;color:var(--textd)}
+
+/* LAYOUT */
+.page{max-width:700px;margin:0 auto;padding:20px 14px 110px;width:100%}
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;position:relative;overflow:hidden;margin-bottom:14px;
+}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
+.ctitle{font-family:var(--font-h);font-size:8px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+
+/* BUTTONS */
+.btn{
+  font-family:var(--font-b);font-weight:600;font-size:14px;
+  padding:11px 22px;border-radius:var(--rs);cursor:pointer;
+  transition:var(--trans);border:1px solid transparent;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;min-height:46px;
+}
+.btn-p{background:var(--gold);color:#04100a;border-color:var(--gold)}
+.btn-p:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,162,39,.3)}
+.btn-o{background:transparent;color:var(--gold);border-color:var(--border2)}
+.btn-o:hover{border-color:var(--gold);background:rgba(201,162,39,.08)}
+.btn-g{background:var(--green);color:#04100a;border-color:var(--green)}
+.btn-g:hover{background:var(--green2);transform:translateY(-1px)}
+.btn-next{
+  background:var(--green);color:#04100a;border-color:var(--green);
+  font-size:15px;padding:14px 28px;border-radius:var(--rs);cursor:pointer;
+  font-family:var(--font-b);font-weight:700;display:flex;align-items:center;gap:8px;
+  transition:var(--trans);min-height:50px;width:100%;justify-content:center;
+  border:none;
+}
+.btn-next:hover{background:var(--green2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,173,78,.35)}
+.btn-skip{background:transparent;color:var(--amber);border-color:rgba(244,162,97,.3);font-size:12px;padding:10px 16px;min-height:46px}
+.btn-skip:hover{background:rgba(244,162,97,.08);border-color:var(--amber)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-lg{font-size:16px;padding:14px 34px}
+
+/* FIXED BOTTOM BAR */
+.action-bar{
+  position:fixed;bottom:24px;left:0;right:0;z-index:700;
+  padding:0 14px;display:flex;gap:8px;align-items:center;
+  max-width:700px;margin:0 auto;
+}
+.action-bar .btn-p{flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px}
+
+/* CHOICES */
+.choice{
+  display:flex;width:100%;text-align:left;padding:13px 14px;
+  border:1px solid var(--border);background:rgba(255,255,255,.02);
+  color:var(--text);font-family:var(--font-b);font-size:13px;
+  border-radius:var(--rs);cursor:pointer;transition:var(--trans);
+  margin-bottom:9px;gap:10px;align-items:flex-start;line-height:1.5;min-height:50px;
+}
+.choice:hover:not(:disabled){border-color:var(--gold);background:rgba(201,162,39,.05)}
+.choice.sel{border-color:var(--gold2);background:rgba(201,162,39,.08)}
+.choice.ok{border-color:var(--green2);background:rgba(26,173,78,.1);color:#a8ffce}
+.choice.bad{border-color:var(--red);background:rgba(230,57,70,.09);color:var(--red2)}
+.clbl{font-family:var(--font-h);font-size:9px;color:var(--textd);min-width:18px;margin-top:3px;flex-shrink:0}
+
+/* MULTI-SELECT */
+.ms{
+  display:flex;align-items:flex-start;gap:10px;padding:12px 13px;
+  border:1px solid var(--border);background:rgba(255,255,255,.02);
+  border-radius:var(--rs);cursor:pointer;transition:var(--trans);
+  margin-bottom:8px;font-size:13px;line-height:1.5;min-height:50px;
+}
+.ms:hover{border-color:var(--gold)}
+.ms.sel{border-color:var(--gold2);background:rgba(201,162,39,.06)}
+.ms.ok{border-color:var(--green2);background:rgba(26,173,78,.08);color:#a8ffce}
+.ms.bad{border-color:var(--red);background:rgba(230,57,70,.07)}
+.ms-chk{
+  width:18px;height:18px;border:1.5px solid var(--border2);border-radius:4px;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;margin-top:1px;transition:var(--trans);
+}
+.ms.sel .ms-chk{background:var(--gold);border-color:var(--gold);color:#04100a}
+
+/* DRAG + TAP */
+.drag-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.drag-it{
+  padding:10px 14px;border:1px solid var(--border);background:rgba(255,255,255,.03);
+  border-radius:var(--rs);cursor:pointer;font-size:13px;transition:var(--trans);
+  user-select:none;line-height:1.4;min-height:44px;display:flex;align-items:center;
+}
+.drag-it:hover{border-color:var(--gold);background:rgba(201,162,39,.06)}
+.drag-it[draggable="true"]{cursor:grab}
+.drag-it.dragging{opacity:.3}
+.drag-it.done{opacity:.2;cursor:default;pointer-events:none}
+.drag-it.tap-sel{border-color:var(--gold2);background:rgba(201,162,39,.14);box-shadow:0 0 0 2px var(--gold2)}
+.dzone{
+  min-height:52px;border:1.5px dashed var(--border2);border-radius:var(--rs);
+  padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;transition:var(--trans);
+}
+.dzone.over{border-color:var(--gold);background:rgba(201,162,39,.05)}
+.dzone-lbl{
+  font-family:var(--font-h);font-size:10px;letter-spacing:2px;padding:6px 12px;
+  border-radius:var(--rs);text-align:center;margin-bottom:6px;
+}
+.myth-lbl{color:var(--red);background:rgba(230,57,70,.07);border:.5px solid rgba(230,57,70,.25);font-size:12px;letter-spacing:1px}
+.fact-lbl{color:var(--green2);background:rgba(26,173,78,.07);border:.5px solid rgba(26,173,78,.25);font-size:12px;letter-spacing:1px}
+
+/* MATCHING */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mitem{
+  padding:10px 11px;border:1px solid var(--border);border-radius:var(--rs);
+  cursor:pointer;font-size:12px;line-height:1.4;transition:var(--trans);
+  text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center;
+}
+.mitem:hover{border-color:var(--gold)}
+.mitem.sel-l{border-color:var(--amber);background:rgba(244,162,97,.09);color:var(--amber)}
+.mitem.sel-r{border-color:var(--amber);background:rgba(244,162,97,.09)}
+.mitem.matched{border-color:var(--green2);background:rgba(26,173,78,.07);color:#a8ffce;cursor:default}
+
+/* SEQUENCE */
+.tile{
+  padding:13px 11px;border:1px solid var(--border);background:rgba(255,255,255,.02);
+  border-radius:var(--rs);cursor:pointer;font-size:12px;line-height:1.4;
+  transition:var(--trans);text-align:center;min-height:56px;
+  display:flex;align-items:center;justify-content:center;
+}
+.tile:hover{border-color:var(--gold)}
+.tile.sel{border-color:var(--gold2);background:rgba(201,162,39,.09);opacity:.5;cursor:default}
+.seq-step{
+  display:flex;align-items:center;gap:9px;padding:9px 12px;
+  background:rgba(201,162,39,.04);border:.5px solid var(--border);
+  border-radius:var(--rs);font-size:12px;margin-bottom:6px;
+}
+.seq-n{font-family:var(--font-h);font-size:9px;color:var(--gold);min-width:16px}
+
+/* LOCK */
+.lock-disp{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.lock-d{
+  width:52px;height:68px;border:2px solid var(--border2);border-radius:var(--rs);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-h);font-size:26px;font-weight:700;color:var(--gold2);
+  background:rgba(201,162,39,.04);transition:all .2s;
+}
+.lock-d.act{border-color:var(--gold);box-shadow:0 0 12px rgba(201,162,39,.25)}
+input.linput{
+  width:100%;padding:12px 14px;background:rgba(201,162,39,.04);
+  border:1px solid var(--border2);border-radius:var(--rs);
+  color:var(--gold2);font-family:var(--font-b);font-size:17px;font-weight:600;
+  outline:none;transition:var(--trans);text-align:center;
+}
+input.linput:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.12)}
+
+/* PYRAMID */
+.pyr-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px}
+.pyr-row{display:flex;justify-content:center}
+.pyr-slot{
+  border:1.5px dashed var(--border2);border-radius:var(--rs);min-height:42px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  color:var(--textd);padding:6px 10px;text-align:center;transition:var(--trans);cursor:pointer;
+}
+.pyr-slot.over{border-color:var(--amber);background:rgba(244,162,97,.06)}
+.pyr-slot.filled{border-color:var(--green2);border-style:solid;background:rgba(26,173,78,.07);color:var(--text);cursor:default;font-size:12px}
+
+/* JIGSAW */
+.jgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.jpc{
+  border:1.5px dashed var(--border2);border-radius:var(--rs);padding:11px 8px;
+  font-size:12px;text-align:center;color:var(--textm);min-height:60px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:var(--trans);line-height:1.4;
+}
+.jpc.placed{border-color:var(--gold);border-style:solid;background:rgba(201,162,39,.05);color:var(--text);cursor:default}
+.jpc.trap{border-color:var(--red)!important;background:rgba(230,57,70,.12)!important;color:var(--red2)!important}
+
+/* ANAGRAM */
+.ana-pool{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:12px}
+.ana-l{
+  width:42px;height:52px;border:1.5px solid var(--border2);border-radius:var(--rs);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-h);font-size:18px;font-weight:700;color:var(--gold2);
+  cursor:pointer;transition:var(--trans);background:rgba(201,162,39,.04);
+}
+.ana-l:hover:not(.used){border-color:var(--gold);background:rgba(201,162,39,.12)}
+.ana-l.used{opacity:.2;cursor:not-allowed}
+.ana-ans{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:12px}
+.ana-s{
+  width:42px;height:52px;border:1.5px dashed var(--border2);border-radius:var(--rs);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-h);font-size:18px;font-weight:700;color:var(--green2);
+  cursor:pointer;transition:var(--trans);
+}
+.ana-s.filled{border-color:var(--green2);border-style:solid;background:rgba(26,173,78,.07)}
+
+/* SCENARIO CARD */
+.sc-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.sc-lbl{font-size:9px;font-family:var(--font-h);color:var(--gold);letter-spacing:2px;margin-bottom:8px}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sc-cell{background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:12px;color:var(--textm)}
+.sc-cell strong{display:block;font-weight:600;margin-top:2px;font-size:14px}
+.sc-cell.hi strong{color:var(--gold2)}
+.sc-cell.danger strong{color:var(--red2)}
+.sc-cell.ok2 strong{color:var(--green2)}
+.fbox{padding:10px 12px;background:rgba(201,162,39,.06);border:.5px solid rgba(201,162,39,.22);border-radius:var(--rs);font-size:12px;color:var(--textm);margin-top:8px}
+.fbox strong{color:var(--gold2)}
+
+/* LEARNING REVEAL (shown after correct answer with NEXT button) */
+#learn-overlay{
+  position:fixed;inset:0;z-index:1000;background:rgba(4,16,10,.97);
+  display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto;
+}
+#learn-overlay.show{display:flex}
+.learn-box{
+  background:var(--panel2);border:2px solid var(--gold);border-radius:14px;
+  padding:24px;max-width:520px;width:100%;position:relative;
+}
+.learn-box::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.learn-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.learn-badge{
+  width:42px;height:42px;border-radius:50%;background:rgba(26,173,78,.15);
+  border:2px solid var(--green2);display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;color:var(--green2);font-weight:700;
+}
+.learn-title{font-family:var(--font-h);font-size:10px;color:var(--green2);letter-spacing:2px}
+.learn-pname{font-size:15px;font-weight:600;color:var(--text);margin-top:2px}
+.lrow{display:flex;gap:9px;margin-bottom:8px;padding:10px 12px;border-radius:var(--rs)}
+.lrow.ll{background:rgba(26,173,78,.07);border:.5px solid rgba(26,173,78,.22)}
+.lrow.lm{background:rgba(230,57,70,.07);border:.5px solid rgba(230,57,70,.22)}
+.lrow.la{background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.22)}
+.lico{font-size:14px;flex-shrink:0;margin-top:1px}
+.ltxt{font-size:12px;line-height:1.65}
+.lrow.ll .ltxt{color:#a8e6bc}
+.lrow.lm .ltxt{color:#f4a8ae}
+.lrow.la .ltxt{color:#ffe08a}
+.ltxt strong{font-weight:600}
+.learn-progress{margin:14px 0 12px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.learn-prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .15s linear}
+.learn-next-btn{
+  width:100%;padding:14px;border-radius:var(--rs);
+  background:var(--green);color:#04100a;border:none;
+  font-family:var(--font-b);font-size:15px;font-weight:700;
+  cursor:pointer;transition:var(--trans);display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:4px;
+}
+.learn-next-btn:hover{background:var(--green2);transform:translateY(-1px)}
+.learn-auto-note{font-size:11px;color:var(--textd);text-align:center;margin-top:7px}
+
+/* ESCAPE ANIMATION */
+#escape-overlay{
+  position:fixed;inset:0;z-index:1100;background:rgba(4,16,10,.97);
+  display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;
+}
+#escape-overlay.show{display:flex}
+.esc-title{
+  font-family:var(--font-h);font-size:clamp(22px,5vw,40px);color:var(--green2);
+  letter-spacing:4px;animation:escpulse 1s ease-in-out infinite;margin-bottom:14px;
+}
+@keyframes escpulse{0%,100%{text-shadow:0 0 20px rgba(34,212,96,.4)}50%{text-shadow:0 0 60px rgba(34,212,96,.9),0 0 100px rgba(34,212,96,.3)}}
+.esc-sub{font-size:14px;color:var(--textm);letter-spacing:2px}
+
+/* ALERT */
+#alert-overlay{
+  position:fixed;inset:0;z-index:1050;background:rgba(0,0,0,.8);
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+#alert-overlay.show{display:flex}
+.alert-box{
+  background:var(--panel2);border:1.5px solid var(--border2);
+  border-radius:var(--r);padding:24px;max-width:420px;width:100%;text-align:center;
+}
+.alert-box.danger{border-color:rgba(230,57,70,.55)}
+.alert-box.success{border-color:rgba(26,173,78,.55)}
+.alert-box.info{border-color:var(--border3)}
+.at{font-family:var(--font-h);font-size:13px;margin-bottom:10px;letter-spacing:2px}
+.alert-box.danger .at{color:var(--red2)}
+.alert-box.success .at{color:var(--green2)}
+.alert-box.info .at{color:var(--gold2)}
+.ab{font-size:13px;color:var(--textm);margin-bottom:18px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+
+/* INTRO */
+.intro-wrap{max-width:480px;margin:0 auto;padding:32px 16px 90px;width:100%}
+.mv-logo{font-family:var(--font-h);font-size:11px;letter-spacing:4px;color:var(--gold);text-align:center;margin-bottom:26px;opacity:.85}
+.intro-title{
+  font-family:var(--font-h);font-size:clamp(22px,6vw,38px);font-weight:900;
+  color:var(--gold2);line-height:1.1;text-align:center;margin-bottom:6px;
+  text-shadow:0 0 36px rgba(201,162,39,.3);
+}
+.intro-sub{font-size:12px;color:var(--textm);text-align:center;margin-bottom:28px;letter-spacing:.8px}
+.field-lbl{font-size:12px;font-weight:600;color:var(--textm);margin-bottom:6px;letter-spacing:.3px}
+input.name-f{
+  width:100%;padding:13px 14px;background:rgba(201,162,39,.05);
+  border:1.5px solid var(--border2);border-radius:var(--rs);
+  color:var(--text);font-family:var(--font-b);font-size:16px;
+  outline:none;transition:var(--trans);margin-bottom:20px;
+}
+input.name-f:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.12)}
+.brief-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:22px}
+.bi{display:flex;gap:9px;font-size:13px;color:var(--textm);line-height:1.5;margin-bottom:8px}
+.bi:last-child{margin-bottom:0}
+.bi-i{color:var(--gold);flex-shrink:0;font-weight:700}
+
+/* PUZZLE HEADER */
+.puz-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.nbadge{font-family:var(--font-h);font-size:9px;letter-spacing:2px;color:var(--gold);background:rgba(201,162,39,.09);border:.5px solid var(--border2);padding:4px 10px;border-radius:14px}
+.tbadge{font-size:11px;color:var(--textm);background:rgba(255,255,255,.04);border:.5px solid var(--border);padding:4px 10px;border-radius:14px}
+.rtag{display:inline-flex;align-items:center;gap:5px;background:rgba(244,162,97,.1);border:.5px solid rgba(244,162,97,.35);color:var(--amber);font-size:11px;font-weight:600;padding:4px 11px;border-radius:14px}
+.ptitle{font-family:var(--font-h);font-size:16px;font-weight:700;color:var(--gold2);margin-bottom:6px;line-height:1.3}
+.pbrief{font-size:13px;color:var(--textm);line-height:1.65;margin-bottom:16px}
+.slbl{font-size:10px;font-weight:600;color:var(--textd);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+
+/* ======= CERTIFICATE — premium design ======= */
+#cert-preview-wrap{
+  background:#0a1f14;border:2px solid var(--gold);border-radius:12px;
+  padding:3px;margin-bottom:14px;
+}
+#cert-canvas-display{
+  width:100%;display:block;border-radius:10px;
+}
+.cert-section{text-align:center;margin-bottom:20px}
+
+/* RESULTS */
+.rh{text-align:center;padding:28px 14px 18px}
+.rtitle{font-family:var(--font-h);font-size:clamp(20px,5vw,32px);font-weight:900;margin-bottom:5px}
+.rtitle.success{color:var(--gold2);text-shadow:0 0 30px rgba(201,162,39,.3)}
+.rtitle.fail{color:var(--red)}
+.rsub{font-size:13px;color:var(--textm);margin-bottom:20px}
+.stats-g{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px}
+.stat-b{background:var(--panel);border:.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
+.sv{font-family:var(--font-h);font-size:24px;font-weight:700;margin-bottom:3px}
+.sv.g{color:var(--green2)}.sv.gd{color:var(--gold2)}.sv.r{color:var(--red2)}
+.slb{font-size:10px;color:var(--textd)}
+.profile-card{background:rgba(201,162,39,.06);border:1px solid var(--border3);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;text-align:center}
+.ptitle2{font-family:var(--font-h);font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:6px}
+.pband{font-size:20px;font-weight:700;margin-bottom:4px}
+.pdesc{font-size:12px;color:var(--textm);line-height:1.5}
+.lesson-item{display:flex;gap:10px;padding:10px 12px;border:.5px solid var(--border);border-radius:var(--rs);margin-bottom:7px;background:rgba(255,255,255,.01)}
+.lnum{font-family:var(--font-h);font-size:9px;color:var(--gold);min-width:20px;flex-shrink:0;margin-top:2px}
+.lbody{font-size:12px;color:var(--textm);line-height:1.6}
+.lname{font-weight:600;color:var(--text);font-size:13px;margin-bottom:2px}
+.mi-item{padding:10px 12px;background:rgba(230,57,70,.05);border:.5px solid rgba(230,57,70,.15);border-radius:var(--rs);margin-bottom:7px}
+.mi-name{font-size:12px;font-weight:600;color:var(--red2);margin-bottom:3px}
+.mi-txt{font-size:11px;color:var(--textm)}
+
+/* INLINE HINT */
+.inline-hint{
+  padding:10px 12px;background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.25);
+  border-radius:var(--rs);font-size:12px;color:#ffe08a;margin-bottom:12px;
+  display:none;gap:8px;align-items:flex-start;line-height:1.6;
+}
+.inline-hint.show{display:flex}
+
+/* CONSEQUENCE */
+.conseq{
+  padding:10px 12px;background:rgba(230,57,70,.07);border:.5px solid rgba(230,57,70,.25);
+  border-radius:var(--rs);font-size:12px;color:var(--red2);margin-top:10px;
+  display:flex;gap:8px;align-items:flex-start;line-height:1.5;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* ====== UPGRADED URGENCY SYSTEM ====== */
+@keyframes o2breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.2)}}
+@keyframes o2pulse{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.5;filter:brightness(2.2)}}
+@keyframes tmppulse{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.45;filter:brightness(2.5)}}
+@keyframes redflash{0%{opacity:0}20%{opacity:.85}60%{opacity:.65}100%{opacity:0}}
+@keyframes dimPulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+/* O2 Oxygen depletion dim overlay */
+#o2dim{position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:rgba(0,10,30,0);transition:background 2.5s ease}
+body.o2low #o2dim{background:rgba(0,8,25,.1)}
+body.o2crit #o2dim{background:rgba(0,5,20,.25);animation:dimPulse 3s ease-in-out infinite}
+body.o2danger #o2dim{background:rgba(0,4,18,.45);animation:dimPulse 1.2s ease-in-out infinite}
+
+/* Red wrong-answer flash */
+#flash-ov{position:fixed;inset:0;z-index:1200;pointer-events:none;
+  background:rgba(230,57,70,0);display:none}
+#flash-ov.flash{display:block;animation:redflash .55s ease-out forwards}
+
+/* Vital status labels */
+.vital-status{
+  font-family:var(--font-h);font-size:7px;letter-spacing:1.5px;font-weight:900;
+  min-width:44px;text-align:right;transition:all .5s ease;
+}
+.vital-status.o2s{color:#52e8ff}
+.vital-status.o2s.low{color:var(--amber)}
+.vital-status.o2s.crit{color:var(--red2);animation:o2pulse .9s ease-in-out infinite}
+.vital-status.tmps{color:var(--green2)}
+.vital-status.tmps.rising{color:var(--amber)}
+.vital-status.tmps.danger{color:var(--red2);animation:tmppulse .75s ease-in-out infinite}
+
+/* O2 fill animations at low levels */
+#o2fill.low-fill{animation:o2breathe 2.4s ease-in-out infinite;transform-origin:left center}
+#o2fill.crit-fill{animation:o2pulse 1s ease-in-out infinite}
+#tmpfill.danger-fill{animation:tmppulse .85s ease-in-out infinite}
+
+/* === FONT SIZE READABILITY IMPROVEMENTS === */
+.pbrief{font-size:15px!important;line-height:1.7!important}
+.ptitle{font-size:17px!important}
+.choice{font-size:15px!important;padding:14px 15px!important}
+.ms{font-size:14px!important;padding:13px 14px!important}
+.drag-it{font-size:14px!important}
+.drag-it.done{display:none!important}
+.drag-it.tap-sel{outline:2px solid var(--gold);background:rgba(201,162,39,.18)!important;box-shadow:0 0 0 3px rgba(201,162,39,.25)}
+.mitem{font-size:13px!important}
+.ltxt{font-size:13px!important;line-height:1.7!important}
+
+/* Puzzle page shake on wrong answer */
+@keyframes wrongShake{
+  0%,100%{transform:translateX(0)}
+  10%,50%,90%{transform:translateX(-8px)}
+  30%,70%{transform:translateX(8px)}
+}
+.puzzle-shake{animation:wrongShake .45s ease-in-out}
+
+/* Escape overlay upgrades */
+.esc-vault-bar{
+  width:min(320px,80vw);height:10px;background:rgba(255,255,255,.06);
+  border-radius:5px;overflow:hidden;margin:22px auto 10px;
+  border:1px solid rgba(26,173,78,.3);
+}
+.esc-vault-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--green),var(--green2),#c9a227);
+  border-radius:5px;box-shadow:0 0 12px rgba(34,212,96,.5);
+}
+.esc-count{font-family:var(--font-h);font-size:11px;color:var(--textm);letter-spacing:3px;text-align:center;margin-top:6px}
+.esc-sparkle{font-size:22px;letter-spacing:8px;animation:escpulse 1s ease-in-out infinite;margin-bottom:14px}
+
+@media(max-width:500px){
+  .stats-g{grid-template-columns:1fr 1fr}
+  .jgrid{grid-template-columns:1fr 1fr}
+  .match-grid{grid-template-columns:1fr}
+  .sc-grid{grid-template-columns:1fr}
+  .vital-bars{min-width:110px}
+  #hud-timer{font-size:22px;min-width:64px;letter-spacing:2px}
+  .vital-status{display:none} /* hide text labels on tiny screens */
+  .hud-brand{display:none}    /* hide brand on tiny screens */
+  .hud-sep:first-of-type{display:none} /* hide first sep too */
+  .vital-lbl{font-size:9px;min-width:30px}
+  .vital-val{font-size:10px;min-width:28px}
+  #hud{padding:6px 10px;gap:10px}
+  .hud-prog-nums{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div id="atm"></div>
+<div id="o2dim"></div>
+<div id="flash-ov"></div>
+
+<!-- FOOTER (always visible) -->
+<div id="footer">
+  <span class="fb">MONEY VICHARA</span>
+  <span class="fc">MISSION: FINANCIAL FREEDOM</span>
+  <span class="fc">Designed by Vishweshwar Mensumane</span>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-brand">MV</div>
+  <div class="hud-sep"></div>
+  <div id="hud-timer">15:00</div>
+  <div class="hud-sep"></div>
+  <div class="vital-bars">
+    <div class="vital-row">
+      <span class="vital-lbl o2-lbl">O₂</span>
+      <div class="vital-track"><div class="vital-fill" id="o2fill" style="width:100%"></div></div>
+      <span class="vital-val o2v" id="o2val">100%</span>
+      <span class="vital-status o2s" id="o2status">STABLE</span>
+    </div>
+    <div class="vital-row">
+      <span class="vital-lbl tmp-lbl">TEMP</span>
+      <div class="vital-track"><div class="vital-fill" id="tmpfill" style="width:0%"></div></div>
+      <span class="vital-val tmpv" id="tmpval">0%</span>
+      <span class="vital-status tmps" id="tmpstatus">NORMAL</span>
+    </div>
+  </div>
+  <div class="hud-sep"></div>
+  <div class="hud-prog">
+    <div class="hud-prog-nums" id="hprog-nums">0 / 15</div>
+    <div class="hud-prog-sub" id="hprog-sub">NEED 10 TO ESCAPE</div>
+  </div>
+  <div class="hud-sep"></div>
+  <div class="hud-hints" style="display:flex;gap:4px;align-items:center">
+    <div id="hp0" class="hpip" style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);transition:all .3s"></div>
+    <div id="hp1" class="hpip" style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);transition:all .3s"></div>
+    <div id="hp2" class="hpip" style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);transition:all .3s"></div>
+    <div id="hp3" class="hpip" style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);transition:all .3s"></div>
+    <button id="hint-btn" onclick="G.useHint()" style="font-size:10px;padding:4px 10px;border:.5px solid var(--gold);background:rgba(201,162,39,.08);color:var(--gold);border-radius:14px;cursor:pointer;font-family:var(--font-b);font-weight:600">HINT</button>
+  </div>
+</div>
+
+<!-- LEARNING REVEAL (after correct answer — manual NEXT button) -->
+<div id="learn-overlay">
+  <div class="learn-box">
+    <div class="learn-top">
+      <div class="learn-badge">✓</div>
+      <div>
+        <div class="learn-title">PUZZLE SOLVED</div>
+        <div class="learn-pname" id="lr-name"></div>
+      </div>
+    </div>
+    <div class="lrow ll"><div class="lico">✅</div><div class="ltxt" id="lr-learned"></div></div>
+    <div class="lrow lm"><div class="lico">❌</div><div class="ltxt" id="lr-mistake"></div></div>
+    <div class="lrow la"><div class="lico">💡</div><div class="ltxt" id="lr-action"></div></div>
+    <div class="learn-progress"><div class="learn-prog-fill" id="lr-prog" style="width:0%"></div></div>
+    <button class="learn-next-btn" onclick="G.dismissLearn()">NEXT PUZZLE →</button>
+    <div class="learn-auto-note" id="lr-auto-note">Auto-continues in <span id="lr-countdown">10</span>s</div>
+  </div>
+</div>
+
+<!-- ESCAPE ANIMATION -->
+<div id="escape-overlay">
+  <div class="esc-sparkle" id="esc-sparkle" style="display:none">★ ✦ ★ ✦ ★</div>
+  <div class="esc-title" id="esc-t1">VAULT UNLOCKING…</div>
+  <div class="esc-sub" id="esc-t2"></div>
+  <div class="esc-vault-bar"><div class="esc-vault-fill" id="esc-vault-fill"></div></div>
+  <div class="esc-count" id="esc-count">DECRYPTING…</div>
+</div>
+
+<!-- ALERT -->
+<div id="alert-overlay">
+  <div class="alert-box" id="alert-box">
+    <div class="at" id="alert-t"></div>
+    <div class="ab" id="alert-b"></div>
+    <button class="btn btn-o" onclick="G.closeAlert()" style="width:100%;justify-content:center">OK, CONTINUE</button>
+  </div>
+</div>
+
+<!-- CERT CANVAS (hidden, used for drawing) -->
+<canvas id="cert-c" width="900" height="636" style="display:none"></canvas>
+
+<!-- ========== INTRO ========== -->
+<div class="screen active" id="s-intro">
+  <div class="intro-wrap">
+    <div class="mv-logo">★ MONEY VICHARA ★</div>
+    <div class="intro-title">MISSION:<br>FINANCIAL FREEDOM</div>
+    <div class="intro-sub">PERSONAL FINANCE ESCAPE ROOM · 15 MINUTES</div>
+    <div class="field-lbl">Your name (appears on your certificate)</div>
+    <input class="name-f" id="pname" placeholder="Enter your full name…" maxlength="44" type="text"
+      onkeydown="if(event.key==='Enter')G.startGame()">
+    <div class="brief-card">
+      <div class="bi"><span class="bi-i">▸</span>15 personal finance puzzles guard the Blueprint. Solve 10 to escape.</div>
+      <div class="bi"><span class="bi-i">▸</span>Each hint costs 60 sec. Skipping costs 30 sec. Wrong answer costs 30 sec.</div>
+      <div class="bi"><span class="bi-i">▸</span>Skipped/wrong puzzles return in Reattempt Mode — second chance.</div>
+      <div class="bi"><span class="bi-i">▸</span>After each correct answer, read the lesson, then press NEXT PUZZLE.</div>
+    </div>
+    <div style="text-align:center">
+      <button class="btn btn-p btn-lg" onclick="G.startGame()">INITIATE MISSION ▶</button>
+      <div style="margin-top:14px;font-size:11px;color:var(--textd);line-height:1.7;max-width:340px;margin-left:auto;margin-right:auto">
+        ⚠ For educational purposes only. Not financial advice.<br>
+        Figures are illustrative. Consult a SEBI-registered advisor before investing.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PUZZLE SCREEN ========== -->
+<div class="screen" id="s-puzzle">
+  <div class="page fade-up" id="puz-page"></div>
+</div>
+
+<!-- ========== TIMEOUT ========== -->
+<div class="screen" id="s-timeout">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:24px">
+    <div style="font-family:var(--font-h);font-size:36px;color:var(--red);margin-bottom:12px;text-shadow:0 0 30px rgba(230,57,70,.4)">TIME EXPIRED</div>
+    <p style="color:var(--textm);margin-bottom:26px;line-height:1.8;max-width:380px">The safehouse sealed. Every concept you encountered stays with you.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-p" onclick="G.showResults(true)">VIEW RESULTS & LESSONS</button>
+      <button class="btn btn-o" onclick="G.resetGame()">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== RESULTS ========== -->
+<div class="screen" id="s-results">
+  <div class="page" id="results-page"></div>
+</div>
+
+<script>
+// ============================================================
+// PUZZLE BANK
+// ============================================================
+const BANK = [
+  {
+    id:1,title:'True or False: Finance Edition',topic:'Insurance & Savings Myths',type:'myth-drag',
+    q:'Classify each statement as MYTH or FACT. This has a MIX — not all are myths. Think carefully.',
+    hint:'Term insurance is cheap, pure protection — excellent value. Equity MFs have beaten FD in most 15-year windows in Indian history. FD interest IS taxable. LIC endowment plans give poor returns (~4–6%).',
+    learned:'Term insurance at age 30 gives ₹1 Crore cover for ~₹7,000–10,000/year. Equity mutual funds have historically outperformed FD returns over most 15-year periods in India.',
+    mistake:'Treating all financial "conventional wisdom" as always right or always wrong. Both extremes cost money.',
+    action:'Fact-check one financial belief you currently hold using SEBI investor education resources.',
+    consequence:'Blindly following myths → average Indian leaves ₹40–80 Lakh of wealth uncreated over 30 years.',
+    data:{
+      items:[
+        {id:'p1a',text:'Term insurance is a waste — no money back if you survive'},
+        {id:'p1b',text:'Equity mutual funds have beaten FD returns over most 15-year periods in India'},
+        {id:'p1c',text:'LIC endowment plan is the safest combo of insurance + investment'},
+        {id:'p1d',text:'Fixed Deposit interest income is fully taxable as per your income slab'}
+      ],
+      answers:{p1a:'myth',p1b:'fact',p1c:'myth',p1d:'fact'}
+    }
+  },
+  {
+    id:2,title:'The 50-30-20 Salary Allocation',topic:'Budgeting & Tracking',type:'allocation',
+    q:'💰 Meera takes home ₹75,000/month after tax. Apply the 50-30-20 budgeting rule to allocate her salary. Use + / − to set each category. Every rupee must be placed. The rule defines clear boundaries — there is a defensible range for each bucket.',
+    hint:'The 50-30-20 rule is a principle, not a rigid formula: 50% covers essential Needs (rent, EMI, groceries, bills), 30% covers personal Wants (dining, subscriptions, travel), 20% goes to Savings & Investment (SIP, emergency fund, loan prepayment). Apply these percentages to ₹75,000 and find the ranges.',
+    learned:'The 50-30-20 rule makes budgeting simple and sustainable. Most Indians spend 70–80% on needs alone — which leaves nothing for wealth creation. Tracking your spending by category once a month is all it takes to spot the leak.',
+    mistake:'Saving "whatever is left at the end of the month" — which is usually zero. Savings must be transferred on salary day, before any spending begins.',
+    action:'This month: on salary day, auto-transfer 20% to your investment + emergency accounts before anything else. Then live on the rest.',
+    consequence:'Not saving 20% of income: at ₹75,000/month, skipping savings for 10 years at 12% return costs approximately ₹69 Lakhs in lost wealth.',
+    data:{
+      total:75000,step:2500,label:'MONTHLY TAKE-HOME SALARY',
+      categories:[
+        {id:'b1',name:'🏠 Needs (Essentials)',desc:'Rent, groceries, EMIs, utilities, transport — non-negotiable fixed expenses',correct:[30000,42000],color:'#52e8ff'},
+        {id:'b2',name:'🎯 Wants (Lifestyle)',desc:'Dining out, OTT subscriptions, shopping, travel, entertainment',correct:[15000,25000],color:'#ff7c3a'},
+        {id:'b3',name:'📈 Savings & Investment',desc:'SIP, emergency fund top-up, loan prepayment, PPF — wealth building',correct:[15000,20000],color:'#22d460'}
+      ]
+    }
+  },
+  {
+    id:3,title:'The Insurance Allocation Problem',topic:'Insurance Types',type:'matching',
+    q:'Match each person to their MOST critically missing insurance. Every match must be one-to-one. Think about the single biggest financial risk each person carries right now.',
+    hint:'Before using this hint, try reasoning: what is the worst financial event that could happen to each person? Breadwinner dies → family has no income. Diabetic retiree hospitalised → no cover. Freelancer ill → no employer cover. Homeowner defaults → bank takes house. Biker accident → no income + treatment. Child college fee due → no fund.',
+    learned:'Insurance needs are personal — your biggest risk defines your most urgent cover. A diabetic retiree and a healthy freelancer both need health cover, but for completely different policy types.',
+    mistake:'Buying insurance based on what the agent recommends rather than identifying your specific biggest risk first.',
+    action:'List your top 3 financial risks this week. Check if each is covered. Fix the gap that would hurt you the most.',
+    consequence:'Being under-insured on your biggest risk costs an average Indian ₹15–50 Lakh at the point of claim.',
+    data:{
+      people:['Sole breadwinner, 38, 2 school-age children, no life cover','Diabetic, 55, retired — employer health cover just ended','26-yr-old freelancer, no employer benefits, healthy today','New homeowner, ₹80L home loan outstanding','IT professional, travels by bike daily, no accident cover','Salaried couple, child starting college in 1 year'],
+      covers:['Personal health insurance','Home loan protection plan','Term life insurance','Child education plan / term endowment','Comprehensive health (pre-existing friendly)','Personal accident / disability insurance'],
+      correct:{0:2,1:4,2:0,3:1,4:5,5:3}
+    }
+  },
+  {
+    id:4,title:'The Direct Plan Advantage',topic:'Mutual Fund Cost & Direct Plans',type:'mcq',
+    q:'Two investors put ₹10,000/month into the same mutual fund scheme for 25 years. Both choose the same fund, same fund manager, same investment dates. One uses a Direct plan, the other a Regular plan. Both earn identical gross returns before costs. Why does the Direct plan investor typically end up with significantly more wealth?',
+    hint:'The key word is "gross returns before costs." Both investors get the same raw market return. The difference is entirely in what gets subtracted before the return reaches your account. Ask: who is paying for the distributor who sold the Regular plan — and how?',
+    learned:'Direct plans have no distributor commission — that 0.5–1.5% stays in YOUR corpus and compounds for decades. On a 25-year ₹10,000/month SIP, this silent cost difference can exceed ₹40–45 Lakh on the exact same fund. Same fund, same manager, dramatically different outcomes.',
+    mistake:'Assuming your relationship manager adds enough value to justify the commission. For a passive index fund especially, there is nothing to manage — you are paying for nothing.',
+    action:'Log in to CAMS (camsonline.com) or KFintech. Check if your funds say "Regular." If yes, switch to Direct via MF Central (mfcentral.in) — free, online, takes 10 minutes.',
+    consequence:'Staying in Regular plans on ₹10,000/month for 25 years silently costs approximately ₹40–45 Lakh — paid as distributor commission year after year, without a single notification.',
+    data:{
+      options:[
+        {id:'dr1',text:'Direct plans take on higher portfolio risk, which generates higher returns to compensate investors for that risk',correct:false},
+        {id:'dr2',text:'Regular plans include embedded distribution and advisory costs that are deducted from returns annually, reducing the compounding base over time',correct:true},
+        {id:'dr3',text:'Direct plan investors get preferential NAV pricing on the same scheme, which accumulates into a meaningful advantage over decades',correct:false},
+        {id:'dr4',text:'Regular plans invest in a slightly different underlying portfolio that is more conservatively positioned, producing lower absolute returns',correct:false}
+      ]
+    }
+  },
+  {
+    id:5,title:'The Term Plan Vault',topic:'Term Life Insurance',type:'number-lock',
+    q:'Calculate Rajesh\'s minimum life cover using the Human Life Value (HLV) method. His profile is shown. Enter the answer in Lakhs. No decimals.',
+    hint:'HLV = Annual Income × Remaining Working Years. Remaining years = Retirement age minus current age. Apply the formula to the values in Rajesh\'s profile card above.',
+    learned:'Human Life Value = your future earning potential. Most Indians carry ₹5–15 Lakh cover when their actual HLV demands ₹1–3 Crore — a 10–100x gap.',
+    mistake:'Buying term cover based on the agent\'s suggestion (usually very low) rather than doing the HLV calculation yourself.',
+    action:'Calculate your own HLV right now: Annual income × remaining working years. If your current cover is lower, upgrade it immediately.',
+    consequence:'Being underinsured by ₹1 Crore leaves your family short by ₹1 Crore — that gap is permanent.',
+    data:{
+      fields:[{k:'Annual income',v:'₹6,00,000',hi:true},{k:'Current age',v:'35 years',hi:true},{k:'Retirement age',v:'60 years',hi:true},{k:'Dependents',v:'Spouse + 1 child',hi:false}],
+      answer:'150',digits:3,formula:'HLV = Annual Income × (Retirement Age − Current Age)'
+    }
+  },
+  {
+    id:6,title:'Financial Triage — Spot the Crises',topic:'Financial Planning',type:'multi-select',
+    q:'Look at Priya\'s financial profile below. Select the 3 MOST CRITICAL financial risks needing immediate attention.',
+    hint:'Priority order in financial planning: (1) Adequate protection — insurance, (2) Emergency fund stability, (3) Debt management. Which of these is Priya most critically missing?',
+    learned:'The "protect-first" principle: before investing, ensure you have insurance and emergency fund. Priya skips both — one bad event wipes everything.',
+    mistake:'High earners often invest aggressively while ignoring that they are one medical event or job loss away from financial collapse.',
+    action:'This week: buy a ₹5 Lakh floater health insurance. Open a liquid fund. Auto-transfer 3 months\' expenses into it. Review EMI ratio.',
+    consequence:'Without health insurance, one hospitalisation = ₹3–8 Lakh out-of-pocket. Without emergency fund, Priya borrows at 16–24% interest.',
+    data:{
+      profile:[
+        {k:'Monthly salary',v:'₹80,000',cls:'hi'},
+        {k:'Total EMIs (home + car + personal)',v:'₹55,000/month',cls:'hi'},
+        {k:'Emergency fund',v:'₹0 — none maintained',cls:'hi'},
+        {k:'Health insurance',v:'No active policy',cls:'hi'},
+        {k:'Term life cover',v:'₹50 Lakhs (active)',cls:'hi'},
+        {k:'Investments',v:'Only gold (₹2L total)',cls:'hi'}
+      ],
+      options:[
+        {id:'e1',text:'EMI-to-income ratio is 68.75% — nearly double the safe 35–40% threshold',correct:true},
+        {id:'e2',text:'Gold investment of ₹2 Lakh provides adequate emergency liquidity for most financial shocks',correct:false},
+        {id:'e3',text:'Zero emergency fund — one job loss or illness = immediate debt crisis',correct:true},
+        {id:'e4',text:'No health insurance — one hospitalisation can cost ₹3–8 Lakh out of pocket',correct:true},
+        {id:'e5',text:'Has ₹50 Lakh term life cover — this is adequate for her income level',correct:false},
+        {id:'e6',text:'Invests only in gold — misses equity growth but is not the primary crisis here',correct:false}
+      ],
+      correctCount:3
+    }
+  },
+  {
+    id:7,title:'Build the Risk Pyramid',topic:'Asset Allocation',type:'pyramid',
+    q:'Place each investment at the correct risk level. Most stable at BASE (bottom). Most risky at TOP.',
+    hint:'Base (Level 1) = Government guaranteed: PPF/EPF. Level 2 = FD/Liquid. Level 3 = Gold/SGB. Level 4 = Diversified Equity MF. Level 5 = Direct stocks. Top (Level 6) = Crypto.',
+    learned:'Asset allocation determines 90% of long-term investment returns. Build a strong stable base before adding risky growth assets.',
+    mistake:'Beginners start with crypto or direct stocks, lose confidence after the first correction, and exit investing entirely.',
+    action:'Check your current portfolio. Ensure at least 40–50% is in stable instruments before adding equity.',
+    consequence:'Investing without a stable base means one market correction causes panic-selling at a loss.',
+    data:{
+      items:[
+        {id:'pv1',text:'PPF / EPF / Govt bonds',level:1},
+        {id:'pv2',text:'Cryptocurrency',level:6},
+        {id:'pv3',text:'Equity Index / Diversified MF',level:4},
+        {id:'pv4',text:'Fixed Deposit / Liquid Fund',level:2},
+        {id:'pv5',text:'Gold / Sovereign Gold Bond',level:3},
+        {id:'pv6',text:'Direct Stocks / Sector funds',level:5}
+      ]
+    }
+  },
+  {
+    id:8,title:'The Policy Trap Hunt',topic:'Health Insurance Fine Print',type:'jigsaw-trap',
+    q:'Step 1: Click all 6 pieces to reconstruct the policy. Step 2: Identify and tap the 3 hidden danger clauses.',
+    hint:'The 3 most common hidden traps: (1) Co-payment — you pay a % of every claim. (2) Room rent sub-limit — daily room capped far below hospital rates. (3) Waiting period — no coverage for pre-existing diseases for years.',
+    learned:'Understanding your health insurance BEFORE a claim is critical. Most rejections happen not due to fraud but due to clauses the buyer never read.',
+    mistake:'Comparing health insurance only on premium and sum insured — the exclusions and limits matter far more at claim time.',
+    action:'Read your policy tonight: look for co-pay %, room rent sub-limit, and pre-existing disease waiting period. Upgrade if unfavorable.',
+    consequence:'A 20% co-pay on a ₹5 Lakh claim means you pay ₹1 Lakh cash — on top of premiums you already paid.',
+    data:{
+      pieces:[
+        {id:'j1',text:'Policyholder: Sunil Kumar · Sum Insured: ₹5,00,000 · Policy year: 3rd',trap:false},
+        {id:'j2',text:'Cashless facility available at 8,500+ network hospitals across India',trap:false},
+        {id:'j3',text:'All admissible claims subject to 20% co-payment by the insured on every claim',trap:true},
+        {id:'j4',text:'Covered expenses: In-patient hospitalisation, day care procedures, pre- and post-surgery costs',trap:false},
+        {id:'j5',text:'Eligible room category: up to ₹3,000 per day; charges above this limit borne by insured',trap:true},
+        {id:'j6',text:'Pre-existing conditions, including diabetes and hypertension, covered after 36 months continuous policy',trap:true}
+      ]
+    }
+  },
+  {
+    id:9,title:'The Compounding Trade-off',topic:'Retirement Planning',type:'mcq',
+    q:'Arjun, age 30, wants ₹2 Crore by retirement at 60. He will invest ₹5,000/month for 30 years. His advisor gives four strategies. Which one is most likely to achieve his goal — and why?',
+    hint:'Apply the Rule of 72: divide 72 by the annual return rate to find how many years money takes to double. At 12%, money doubles every 6 years. At 8%, every 9 years. Over 30 years that difference is massive. Also consider: what does starting 10 years later cost in terms of compounding time?',
+    learned:'At a historical average of 12%/year for 30 years, ₹5,000/month → approx ₹1.76 Crore. At 8%, the same SIP → only ₹75 Lakhs. Staying invested through crashes is essential — the recovery always exceeds the dip for long-term holders. Past returns do not guarantee future performance.',
+    mistake:'Choosing "safer" debt instruments for a 30-year retirement goal in your 30s. You lose the equity premium at exactly the stage where time is your biggest asset.',
+    action:'Invest retirement savings in a Nifty 50 index fund (direct plan) while young. Shift gradually to debt after age 50 using the 100-minus-age rule.',
+    consequence:'Choosing 8% debt over 12% equity for 30 years on ₹5,000/month costs approximately ₹1 Crore in lost wealth.',
+    data:{
+      context:[{k:'Current age',v:'30'},{k:'Target corpus',v:'₹2 Crore'},{k:'SIP amount',v:'₹5,000/month'},{k:'Retirement',v:'Age 60 (30 years)'}],
+      options:[
+        {id:'r1',text:'Shift the entire SIP into a short-term debt fund — retirement money must never face market volatility, regardless of how far away retirement is.',correct:false},
+        {id:'r2',text:'Stay invested in a diversified equity index fund, accepting short-term market cycles in exchange for the long-term equity premium over a 30-year horizon.',correct:true},
+        {id:'r3',text:'Begin the same ₹5,000 SIP at age 40 instead of 30 — the monthly amount is identical, so the final corpus will be similar with a decade less commitment.',correct:false},
+        {id:'r4',text:'Split equally between sovereign gold bonds and a fixed deposit — this balances inflation protection with capital safety and avoids equity risk entirely.',correct:false}
+      ]
+    }
+  },
+  {
+    id:10,title:'The Credit Score Dilemma',topic:'Credit Score & CIBIL',type:'mcq',
+    q:'Rohan has a CIBIL score of 680. He wants to improve it in 6 months. Which approach is MOST effective AND financially safe?',
+    hint:'CIBIL score factors: 35% payment history (most important), 30% credit utilisation (keep under 30%). Closing cards REDUCES available limit, worsening utilisation. Applying for new credit triggers hard inquiries, temporarily hurting score.',
+    learned:'Pay all dues on time (35% weight) and keep credit card utilisation under 30% (30% weight). These two actions alone will significantly improve any CIBIL score.',
+    mistake:'Closing old credit cards thinking it "cleans" your credit history — it actually reduces your available limit and worsens your utilisation ratio.',
+    action:'Set auto-pay for minimum credit card amount. Keep utilisation under 30%. Never miss an EMI. Check CIBIL free once/year at cibil.com.',
+    consequence:'Score 680 vs 750 can cost 1–2% higher interest on ₹50L home loan = ₹15–25 Lakh extra over 20 years.',
+    data:{
+      options:[
+        {id:'c1',text:'Close all existing credit cards immediately — having fewer active credit lines signals financial discipline to the bureau',correct:false},
+        {id:'c2',text:'Ensure all EMIs and card bills are paid on the due date, and keep the total outstanding balance well below the credit limit each month',correct:true},
+        {id:'c3',text:'Apply for two or three new credit cards to increase total available credit and dilute the current outstanding percentage',correct:false},
+        {id:'c4',text:'Raise a formal dispute with CIBIL to have older negative entries expunged — bureaus are required to remove entries older than 3 years',correct:false}
+      ]
+    }
+  },
+  {
+    id:11,title:'The Passive Revolution',topic:'Passive vs Active Investing',type:'multi-select',
+    q:'Vikram wants to start investing in equity mutual funds. His advisor says "active funds beat the market — you need a professional to pick stocks." Which 3 of the statements below are backed by evidence and should guide Vikram\'s decision?',
+    hint:'The evidence on active vs passive investing has accumulated over decades. Think about: (1) What happens to fund manager fees whether or not you make money? (2) What is an index fund actually tracking? (3) Do most active fund managers consistently beat their benchmark? Look at the statements through the lens of long-term evidence, not short-term sales pitch.',
+    learned:'Index funds passively track a market index (e.g. Nifty 50) with minimal expense ratios (0.1–0.2%). Over 10+ years, most actively managed large-cap funds fail to beat their benchmark after fees. Low-cost index investing is one of the most evidence-based wealth strategies for individual investors.',
+    mistake:'Choosing active funds for their recent 1–3 year returns, which rarely persist. Past outperformance does not predict future performance — but low expense ratios do predict higher long-term returns.',
+    action:'Start or shift to a Nifty 50 or Nifty 500 index fund (direct plan). Keep expense ratio under 0.2%. Review every 3–5 years, not every month.',
+    consequence:'Choosing a 1.5% expense active fund over a 0.1% index fund: over 30 years on ₹5,000/month, this 1.4% drag costs approximately ₹18–25 Lakh in lost returns.',
+    data:{
+      options:[
+        {id:'ps1',text:'Index funds track a market index and have very low expense ratios (0.1–0.2%) with no active stock-picking',correct:true},
+        {id:'ps2',text:'Most actively managed large-cap funds in India fail to beat their benchmark index consistently over 10-year periods',correct:true},
+        {id:'ps3',text:'Active fund managers guarantee better returns because they can exit bad stocks before a crash',correct:false},
+        {id:'ps4',text:'A lower expense ratio directly means more of your returns stay invested and compound for you',correct:true},
+        {id:'ps5',text:'You should switch your index fund when the market drops more than 20% to protect your capital',correct:false},
+        {id:'ps6',text:'A fund with 3-year top returns is the safest choice for long-term investment',correct:false}
+      ],
+      correctCount:3
+    }
+  },
+  {
+    id:12,title:'The Goal-Investment Match',topic:'Goal-Based Investing & Diversification',type:'matching',
+    q:'Match each financial goal to the most appropriate investment vehicle. The right choice depends on time horizon and liquidity needs — not just returns. Every match is one-to-one.',
+    hint:'Time horizon drives everything: Under 1 year → capital safety + liquidity matters most (liquid fund/FD). 1–3 years → short-term debt funds. 3–7 years → balanced/hybrid funds. 7+ years → equity index funds for maximum compounding. Emergency fund must NEVER go into equity — you need it on day 1.',
+    learned:'Goal-based investing means each rupee has a purpose and a timeline. Using equity for a 1-year goal is dangerous (markets can fall 30–40% just before you need the money). Using FD for a 30-year goal loses the equity premium. Match the vehicle to the time horizon — not to the return rate.',
+    mistake:'Putting all money in one instrument — whether FD, gold, or equity. Diversification across time-horizon-matched instruments reduces risk without reducing long-term wealth.',
+    action:'List your top 3 financial goals this week. Write the target year for each. Choose the investment vehicle that matches the time horizon. Automate contributions.',
+    consequence:'Investing a 1-year goal in equity and facing a market crash can delay the goal by 2–3 years. Investing a 20-year goal in FD costs ₹50–80 Lakh in lost compounding on ₹5,000/month.',
+    data:{
+      people:['Emergency fund — needed anytime, must be instantly accessible','Buying a car in 2 years — fixed target, can\'t afford loss','Child\'s wedding in 6 years — medium-term, some growth needed','Retirement corpus — 25 years away, maximum compounding needed','Daughter\'s college fees — due in 10 years, moderate growth','Foreign vacation next year — fixed cost, no risk acceptable'],
+      covers:['Equity index fund (Nifty 50 / Nifty 500) — direct plan','Short-term debt mutual fund (1–3 year maturity)','Liquid mutual fund or savings account — zero lock-in','Balanced / aggressive hybrid fund (mix of equity + debt)','5-year bank FD or recurring deposit — guaranteed return','Large-cap equity or flexi-cap fund with 7–10 year view'],
+      correct:{0:2,1:4,2:3,3:0,4:5,5:1}
+    }
+  },
+  {
+    id:14,title:'The Age Equation',topic:'Asset Allocation & Rebalancing',type:'mcq',
+    q:'Rajan is 52 years old. He started investing at 30 and has never rebalanced his portfolio. His current allocation: 85% equity mutual funds, 15% debt. His retirement target is age 60. A young colleague tells him to "stay invested in equity for maximum returns." What should Rajan actually do — and why?',
+    hint:'There is a simple rule linking age to equity exposure. Think about what changes as you approach retirement: (1) Your ability to recover from a market crash reduces as your time horizon shrinks. (2) The rule uses your age directly. What percentage of equity is appropriate for a 52-year-old vs a 30-year-old? And what does "rebalancing" mean in practice?',
+    learned:'The 100-minus-age rule: equity allocation = 100 − your age. At 52, ideal equity = 48%, debt = 52%. Rajan is dangerously over-exposed. A 30–40% market correction at age 52 with 85% in equity can permanently destroy his retirement corpus — there is no time to recover.',
+    mistake:'Staying "fully invested in equity for maximum returns" without reducing exposure as retirement approaches. A crash at the wrong time is catastrophic. Time horizon, not greed, must drive allocation.',
+    action:'Calculate your ideal equity % today: 100 − your age. If your actual allocation is more than 10–15% above this, rebalance by moving excess equity to debt funds or liquid funds. Review annually.',
+    consequence:'A 35% equity crash at age 52 with 85% in equity destroys ₹35L of every ₹1 Crore invested. At age 30, the same crash recovers in 5–7 years. At 52, with 8 years to retirement, it may never fully recover.',
+    data:{
+      options:[
+        {id:'ae1',text:'Stay fully in equity — with 8 years still to go, the portfolio has enough time to recover from any dip and maximise the final corpus before retirement.',correct:false},
+        {id:'ae2',text:'Gradually shift a significant portion out of equity into debt instruments — as retirement approaches, protecting the existing corpus matters more than chasing additional growth.',correct:true},
+        {id:'ae3',text:'Exit all equity positions immediately and move entirely into fixed deposits — at 52, the priority must be capital preservation above everything else.',correct:false},
+        {id:'ae4',text:'Make no changes now but set a trigger to rebalance only if markets fall by more than 20% — acting during a rising market locks in unnecessary losses.',correct:false}
+      ]
+    }
+  },
+  {
+    id:15,title:'The Document Vault',topic:'Nomination, Will & Estate Planning',type:'matching',
+    q:'Match each document or action to what it actually protects against. These are not the same thing — confusing them leaves families stranded. Every match is one-to-one.',
+    hint:'Think about what each document legally does: A nomination tells a bank/insurer who to hand money to temporarily — it does NOT transfer ownership. A Will transfers legal ownership after death. A joint account allows immediate access. An insurance nomination ensures claim payment. A legal heir certificate is what courts require without a Will. Think about the risk each one is actually solving.',
+    learned:'Nomination ≠ ownership. A nominee only holds assets as a trustee for legal heirs — without a Will, legal heirs can still claim assets from the nominee. A Will + Nomination together create a complete, clean transfer. Without both, even ₹1 Crore in savings can be frozen for years in legal disputes.',
+    mistake:'Assuming that adding a nominee means your money automatically goes to them. Families regularly discover that nominee and legal heir conflicts require years of court proceedings — on money that was "all arranged."',
+    action:'This week: (1) Check all bank accounts, insurance policies, PF, demat accounts have nominees filled. (2) Write a simple Will — even a handwritten, witnessed Will is legally valid. (3) Tell your spouse and children where all documents are kept.',
+    consequence:'Dying without a Will or nomination on ₹50L in assets: the family can spend ₹2–5L and 2–7 years in legal proceedings to access money that was always theirs.',
+    data:{
+      people:['Bank FD with no nomination — family needs access after death','Insurance policy — ensuring claim is paid quickly without legal hassle','Mutual fund / demat account — ensure holdings transfer without court order','Multiple family members dispute who inherits your assets after death','Spouse needs immediate access to joint savings account during emergency','No documents exist at all — family does not know what assets you hold'],
+      covers:['Write a legally valid Will naming beneficiaries clearly','Open a joint account with spouse with "Either or Survivor" mandate','Ensure insurance nomination matches intended beneficiary','Prepare a document listing all assets, policies, logins — share with family','Add nominee on all financial accounts immediately','Register nominee + submit transmission request in advance'],
+      correct:{0:4,1:2,2:5,3:0,4:1,5:3}
+    }
+  },
+  {
+    id:13,title:'The ₹1 Lakh Windfall',topic:'Wealth Allocation & Prioritisation',type:'mcq',
+    q:'You already have a 6-month emergency fund, adequate health and term insurance, and ongoing SIP investments aligned to your long-term goals. You receive a ₹1,00,000 windfall. What is the MOST efficient use of this amount?',
+    hint:'Since your financial foundation is already solid — emergency fund, insurance, and SIP all in place — the windfall does not need to go to the basics. Ask: what is the single highest-impact action remaining? Think about whether you carry any high-interest debt (credit card, personal loan) and what that costs you annually versus what an investment earns.',
+    learned:'When your financial base is covered, a windfall is best used to eliminate high-interest debt first (credit card debt at 36–42% per year is a guaranteed return of that amount). If no high-interest debt exists, investing in line with your existing goals is the most efficient path. Lifestyle spending from a windfall is valid only after these.',
+    mistake:'Investing a windfall into equity when you are simultaneously carrying a personal loan at 14–18% interest. No equity fund consistently beats that after tax. Eliminating the loan is the better guaranteed return.',
+    action:'Check if you have any outstanding high-interest loans. If yes, prepay them first. If no, top up your existing SIPs or index fund. Do not split the amount simply out of habit.',
+    consequence:'Keeping ₹1 Lakh in a savings account at 3.5% while paying 16% on a personal loan costs approximately ₹12,500 net per year — certain and avoidable.',
+    data:{
+      options:[
+        {id:'w1',text:'Invest the entire amount immediately into existing equity funds — since the financial base is covered, additional investing always maximises long-term wealth',correct:false},
+        {id:'w2',text:'Keep the entire amount in a savings account — windfalls should be held liquid for at least 6 months before committing to any decision',correct:false},
+        {id:'w3',text:'Use the amount to prepay a portion of any existing high-interest loan; if none exists, invest it in line with existing long-term goals',correct:true},
+        {id:'w4',text:'Split equally between lifestyle spending and a fixed deposit — a windfall is meant to be enjoyed, and the FD ensures some savings discipline',correct:false}
+      ]
+    }
+  }
+];
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+const G = (function(){
+  let pName='Agent', hintsLeft=4, timerH=null, sLeft=900;
+  let statuses={}, queue=[], qIdx=0, isReattempt=false;
+  let solved=0, skipped=0, wrongs=0, scoredIds=new Set();
+  let puzStart=0, alertCb=null, learnTimer=null, learnCb=null, learnCountTimer=null;
+  let atmShakeTimer=null, _navigating=false;
+  let _drag=null,_mythPl={},_matchPairs={},_selLeft=null;
+  let _seqSel=[],_mcqSel=null,_msSel=new Set();
+  let _pyrDrag=null,_tapPyrItem=null,_jPlaced=0,_jPhase=1,_traps=0;
+  let _anaAns=[],_tapMythSel=null,_attempts={},_allocState={};
+
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+  function fmt(s){const m=Math.floor(s/60),sc=s%60;return(m<10?'0':'')+m+':'+(sc<10?'0':'')+sc}
+  function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+  // TIMER
+  function startTimer(){
+    if(timerH)clearInterval(timerH);
+    timerH=setInterval(()=>{
+      if(sLeft<=0){clearInterval(timerH);timerH=null;onTimeOut();return}
+      sLeft--;updateHUD();updateAtm();
+    },1000);
+  }
+  function stopTimer(){if(timerH){clearInterval(timerH);timerH=null}}
+  function penalty(s){sLeft=Math.max(0,sLeft-s);updateHUD();updateAtm()}
+
+  function updateHUD(){
+    $('hud-timer').textContent=fmt(sLeft);
+    const pct=sLeft/900;
+    const te=$('hud-timer');te.className='';
+    if(pct<.15)te.className='crit';else if(pct<.33)te.className='warn';
+
+    // Smooth non-linear curves — o2 = 100*(pct^1.5), temp = 100*(1-pct^1.3)
+    const o2=Math.max(0,Math.min(100,Math.round(100*Math.pow(pct,1.5))));
+    const tmp=Math.max(0,Math.min(100,Math.round(100*(1-Math.pow(pct,1.3)))));
+
+    // O2 bar
+    const o2f=$('o2fill');
+    o2f.style.width=o2+'%';
+    o2f.style.background=o2>60?'linear-gradient(90deg,#00c8ff,#52e8ff)':o2>30?'linear-gradient(90deg,#f4a261,#ffc09f)':'linear-gradient(90deg,#e63946,#ff6b74)';
+    o2f.className='vital-fill';
+    if(o2<=15)o2f.classList.add('crit-fill');
+    else if(o2<=30)o2f.classList.add('low-fill');
+    $('o2val').textContent=o2+'%';
+    $('o2val').style.color=o2>60?'#52e8ff':o2>30?'#ffc09f':'#ff6b74';
+    const o2s=$('o2status');
+    if(o2s){o2s.className='vital-status o2s';
+      if(o2<=15){o2s.textContent='CRITICAL';o2s.classList.add('crit')}
+      else if(o2<=30){o2s.textContent='LOW';o2s.classList.add('low')}
+      else o2s.textContent='STABLE';}
+
+    // Temp bar
+    const tf=$('tmpfill');
+    tf.style.width=tmp+'%';
+    tf.style.background=tmp<40?'linear-gradient(90deg,#22d460,#52b788)':tmp<70?'linear-gradient(90deg,#f4a261,#ff7c3a)':'linear-gradient(90deg,#e63946,#ff3355)';
+    tf.className='vital-fill';
+    if(tmp>=85)tf.classList.add('danger-fill');
+    $('tmpval').textContent=tmp+'%';
+    $('tmpval').style.color=tmp<40?'#52b788':tmp<70?'#ff7c3a':'#ff3355';
+    const tmps=$('tmpstatus');
+    if(tmps){tmps.className='vital-status tmps';
+      if(tmp>=70){tmps.textContent='DANGEROUS';tmps.classList.add('danger')}
+      else if(tmp>=40){tmps.textContent='RISING';tmps.classList.add('rising')}
+      else tmps.textContent='NORMAL';}
+
+    const need=Math.max(0,10-solved);
+    $('hprog-nums').textContent=solved+' / '+BANK.length;
+    $('hprog-sub').textContent=need>0?`NEED ${need} MORE TO ESCAPE`:'ESCAPE READY ✓';
+    $('hprog-sub').style.color=need>0?'var(--textm)':'var(--green2)';
+    $('hprog-nums').style.color=need>0?'var(--gold2)':'var(--green2)';
+  }
+
+  function updateAtm(){
+    const pct=sLeft/900;
+    document.body.className='';
+    if(pct<.05){document.body.classList.add('heat5','o2danger');
+      if(!atmShakeTimer)atmShakeTimer=setInterval(()=>{document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake')},3500);
+    }else if(pct<.15){document.body.classList.add('heat4','o2crit');clearAtmShake()}
+    else if(pct<.30){document.body.classList.add('heat3','o2low');clearAtmShake()}
+    else if(pct<.50){document.body.classList.add('heat2');clearAtmShake()}
+    else if(pct<.70){document.body.classList.add('heat1');clearAtmShake()}
+    else clearAtmShake();
+    if(sLeft===30){document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake')}
+  }
+  function clearAtmShake(){if(atmShakeTimer){clearInterval(atmShakeTimer);atmShakeTimer=null}}
+  function onTimeOut(){
+    stopTimer();clearAtmShake();document.body.className='';
+    const fov=$('flash-ov');if(fov)fov.classList.remove('flash');
+    showScreen('s-timeout');$('hud').classList.remove('on');
+  }
+
+  // START
+  function startGame(){
+    const n=($('pname').value||'').trim();
+    if(!n){
+      const inp=$('pname');inp.focus();
+      inp.style.borderColor='var(--red2)';inp.style.boxShadow='0 0 0 2px rgba(230,57,70,.25)';
+      setTimeout(()=>{inp.style.borderColor='';inp.style.boxShadow=''},2000);
+      return;
+    }
+    pName=n;hintsLeft=4;sLeft=900;
+    solved=0;skipped=0;wrongs=0;scoredIds=new Set();
+    isReattempt=false;statuses={};_attempts={};
+    BANK.forEach(p=>{statuses[p.id]='unseen';_attempts[p.id]=0});
+    // Fully random question order — keeps every playthrough fresh
+    queue=shuffle(BANK.map(p=>p.id));
+    qIdx=0;
+    for(let i=0;i<4;i++)$('hp'+i)?.classList.remove('used');
+    $('hint-btn').disabled=false;
+    showScreen('s-puzzle');$('hud').classList.add('on');
+    updateHUD();startTimer();renderCurrent();
+  }
+
+  // PUZZLE ROUTING
+  function curPuz(){return BANK.find(p=>p.id===queue[qIdx])}
+  function resetState(){
+    _drag=null;_mythPl={};_matchPairs={};_selLeft=null;
+    _seqSel=[];_mcqSel=null;_msSel=new Set();
+    _pyrDrag=null;_tapPyrItem=null;_jPlaced=0;_jPhase=1;_traps=0;
+    _anaAns=[];_tapMythSel=null;_allocState={};
+  }
+  function renderCurrent(){
+    _navigating=false; // reset navigation guard on each new puzzle
+    const p=curPuz();if(!p){checkEnd();return}
+    puzStart=Date.now();resetState();
+    const pg=$('puz-page');
+    pg.innerHTML=buildPuzHTML(p);
+    pg.classList.remove('fade-up');void pg.offsetWidth;pg.classList.add('fade-up');
+    window.scrollTo(0,0);
+  }
+
+  function goToNextPuzzle(){
+    // NOTE: _navigating guard is intentionally NOT here.
+    // The guard lives in onCorrect/onWrong/skipPuzzle to block double-submit.
+    // Once those set _navigating=true, we want the overlay callback to advance freely.
+    // renderCurrent() resets _navigating=false for the new puzzle.
+    qIdx++;
+    if(qIdx>=queue.length) checkEnd();
+    else renderCurrent();
+  }
+
+  function checkEnd(){
+    if(solved>=10){triggerEscape();return}
+    const rem=BANK.filter(p=>statuses[p.id]==='wrong'||statuses[p.id]==='skipped');
+    if(!rem.length){stopTimer();showResults(false);return}
+    isReattempt=true;queue=shuffle(rem.map(p=>p.id));qIdx=0;
+    const need=10-solved;
+    showAlert('⚠ REATTEMPT MODE',
+      `You solved ${solved}/${BANK.length}. Need ${need} more to escape!\n\n${rem.length} puzzle${rem.length>1?'s':''} returning now. This is your last chance — oxygen is running out.`,
+      'info',()=>renderCurrent());
+  }
+
+  function onCorrect(){
+    if(_navigating)return; // guard against double-submit
+    const p=curPuz();
+    if(scoredIds.has(p.id)){_navigating=true;showLearnReveal(p,()=>goToNextPuzzle());return}
+    _navigating=true;
+    scoredIds.add(p.id);statuses[p.id]='correct';solved++;updateHUD();
+    // Celebration burst — immediate feedback before learn overlay
+    const C=['#22d460','#52e8ff','#c9a227','#fff5c2','#e8c14a'];
+    for(let i=0;i<32;i++)setTimeout(()=>{
+      const e=document.createElement('div');const sz=4+Math.random()*7;
+      e.style.cssText=`position:fixed;width:${sz}px;height:${sz}px;
+        border-radius:${Math.random()>.5?'50%':'2px'};pointer-events:none;z-index:9999;
+        left:${25+Math.random()*50}vw;top:35%;
+        background:${C[Math.floor(Math.random()*C.length)]};
+        animation:confettiFall ${0.9+Math.random()*1.4}s ease-out forwards`;
+      document.body.appendChild(e);setTimeout(()=>e.remove(),3000);
+    },i*18);
+    showLearnReveal(p,()=>goToNextPuzzle());
+  }
+
+  function onWrong(msg,consequence){
+    if(_navigating)return; // guard
+    const p=curPuz();wrongs++;
+    _attempts[p.id]=(_attempts[p.id]||0)+1;
+    if(statuses[p.id]!=='correct')statuses[p.id]='wrong';
+    penalty(30);
+    // Red flash + shake
+    const fov=$('flash-ov');
+    if(fov){fov.classList.remove('flash');void fov.offsetWidth;fov.classList.add('flash')}
+    const pg=$('puz-page');
+    if(pg){pg.classList.remove('puzzle-shake');void pg.offsetWidth;pg.classList.add('puzzle-shake')}
+    // After 3 wrong attempts: extra penalty, disable, auto-advance
+    if(_attempts[p.id]>=3){
+      penalty(60); // additional -60s on top of -30 above
+      _navigating=true;
+      showAlert('MAX ATTEMPTS — AUTO-ADVANCE',
+        `3 failed attempts on this puzzle. −60 sec additional penalty.\n\nCorrect approach: ${p.hint}\n\nPuzzle returns in Reattempt Mode.`,
+        'danger',()=>goToNextPuzzle());
+      return;
+    }
+    let body=msg||'Incorrect answer. −30 seconds.';
+    if(consequence)body+='\n\n⚠ Real cost: '+consequence;
+    // Show inline hint after 2nd wrong
+    if(_attempts[p.id]>=2){
+      const hint=$('inline-hint');
+      if(hint){hint.classList.add('show');hint.querySelector('.ih-txt').textContent='Auto-hint: '+p.hint}
+    }
+    _navigating=true;
+    showAlert('INCORRECT ✕',body,'danger',()=>goToNextPuzzle());
+  }
+
+  function skipPuzzle(){
+    if(_navigating)return; // guard
+    const p=curPuz();if(!p)return;
+    if(statuses[p.id]==='correct'){goToNextPuzzle();return}
+    statuses[p.id]='skipped';
+    skipped++;penalty(30);
+    _navigating=true;
+    showAlert('SKIPPED','Puzzle skipped. −30 seconds. It returns in Reattempt Mode.','info',()=>goToNextPuzzle());
+  }
+  function useHint(){
+    if(!hintsLeft)return;
+    const p=curPuz();hintsLeft--;
+    const pip=$('hp'+(3-hintsLeft));
+    if(pip){pip.style.background='var(--textd)';pip.style.boxShadow='none'}
+    if(!hintsLeft)$('hint-btn').disabled=true;
+    penalty(60);showAlert('AGENT INTEL',p.hint,'info',null);
+  }
+
+  // LEARNING REVEAL — manual NEXT button + 10s auto
+  function showLearnReveal(p,cb){
+    learnCb=cb;
+    $('lr-name').textContent=p.title;
+    $('lr-learned').innerHTML=`<strong>What you learned:</strong> ${esc(p.learned)}`;
+    $('lr-mistake').innerHTML=`<strong>Common mistake:</strong> ${esc(p.mistake)}`;
+    $('lr-action').innerHTML=`<strong>Smart action:</strong> ${esc(p.action)}`;
+    $('learn-overlay').classList.add('show');
+    const fill=$('lr-prog');fill.style.transition='none';fill.style.width='0%';
+    setTimeout(()=>{fill.style.transition='width 10s linear';fill.style.width='100%'},50);
+    let count=10;
+    $('lr-countdown').textContent=count;
+    if(learnCountTimer)clearInterval(learnCountTimer);
+    learnCountTimer=setInterval(()=>{count--;$('lr-countdown').textContent=Math.max(0,count);if(count<=0)clearInterval(learnCountTimer)},1000);
+    if(learnTimer)clearTimeout(learnTimer);
+    learnTimer=setTimeout(()=>dismissLearn(),10500);
+  }
+  function dismissLearn(){
+    // Clear all timers FIRST to prevent re-entry
+    if(learnTimer){clearTimeout(learnTimer);learnTimer=null}
+    if(learnCountTimer){clearInterval(learnCountTimer);learnCountTimer=null}
+    $('learn-overlay').classList.remove('show');
+    const c=learnCb;
+    learnCb=null; // null BEFORE calling — prevents any re-entrant call
+    if(typeof c==='function')c();
+  }
+
+  // ESCAPE ANIMATION
+  function triggerEscape(){
+    stopTimer();clearAtmShake();document.body.className='';$('hud').classList.remove('on');
+    launchConfetti(); // Immediate celebration burst!
+    const ov=$('escape-overlay');ov.classList.add('show');
+    $('esc-t1').textContent='VAULT UNLOCKING…';
+    $('esc-t2').textContent='DECRYPTING FINANCIAL FREEDOM BLUEPRINT…';
+    const sparkle=$('esc-sparkle');if(sparkle)sparkle.style.display='block';
+    // Vault progress bar animation
+    const fill=$('esc-vault-fill');
+    if(fill){fill.style.width='0%';fill.style.transition='none';
+      setTimeout(()=>{fill.style.transition='width 2.8s cubic-bezier(0.1,0.8,0.3,1)';fill.style.width='100%'},200)}
+    let pct=0;
+    const countEl=$('esc-count');
+    const dt=setInterval(()=>{pct=Math.min(100,pct+3);if(countEl)countEl.textContent=`DECRYPTING: ${pct}%`;if(pct>=100)clearInterval(dt)},85);
+    setTimeout(()=>{
+      clearInterval(dt);
+      $('esc-t1').textContent='ESCAPE SUCCESSFUL ★';
+      $('esc-t2').textContent='Financial Freedom Blueprint secured. Mission complete.';
+      if(countEl)countEl.textContent='ALL SYSTEMS UNLOCKED';
+    },3200);
+    setTimeout(()=>{ov.classList.remove('show');showResults(false)},5800);
+  }
+
+  // ALERT
+  function showAlert(t,b,type,cb){
+    alertCb=cb||null;
+    const box=$('alert-box');box.className='alert-box '+(type||'info');
+    $('alert-t').textContent=t;$('alert-b').textContent=b;
+    $('alert-overlay').classList.add('show');
+  }
+  function closeAlert(){
+    $('alert-overlay').classList.remove('show');
+    if(alertCb){const c=alertCb;alertCb=null;c()}
+  }
+
+  // BUILD PUZZLE HTML
+  function buildPuzHTML(p){
+    const idx=BANK.findIndex(x=>x.id===p.id);
+    const st=statuses[p.id];
+    const ra=isReattempt?`<div class="rtag" style="margin-bottom:10px">⚠ Reattempt — previously ${st==='skipped'?'skipped':'incorrect'}</div>`:'';
+    const need=Math.max(0,10-solved);
+    const ntag=need>0
+      ?`<span style="font-size:10px;color:var(--amber);background:rgba(244,162,97,.09);border:.5px solid rgba(244,162,97,.3);padding:3px 10px;border-radius:14px">${need} more to escape</span>`
+      :`<span style="font-size:10px;color:var(--green2);background:rgba(26,173,78,.09);border:.5px solid rgba(26,173,78,.3);padding:3px 10px;border-radius:14px">ESCAPE READY ✓</span>`;
+    const inlineHint=`<div class="inline-hint" id="inline-hint"><span style="font-size:14px;flex-shrink:0">💡</span><span class="ih-txt"></span></div>`;
+    return `<div>${ra}<div class="puz-meta">
+      <span class="nbadge">PUZZLE ${idx+1} / ${BANK.length}</span>
+      <span class="tbadge">${esc(p.topic)}</span>${ntag}</div>
+      <div class="ptitle">${esc(p.title)}</div>
+      <div class="pbrief">${esc(p.q)}</div>
+      ${inlineHint}${buildBody(p)}</div>`;
+  }
+
+  function actionBar(submitFn,label){
+    return `<div class="action-bar">
+      <button class="btn btn-p" onclick="${submitFn}" style="flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px">${esc(label)} ▶</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+
+  function buildBody(p){
+    if(p.type==='myth-drag')return buildMyth(p);
+    if(p.type==='mcq')return buildMCQ(p);
+    if(p.type==='matching')return buildMatch(p);
+    if(p.type==='sequence')return buildSeq(p);
+    if(p.type==='number-lock')return buildLock(p);
+    if(p.type==='multi-select')return buildMS(p);
+    if(p.type==='pyramid')return buildPyramid(p);
+    if(p.type==='jigsaw-trap')return buildJigsaw(p);
+    if(p.type==='anagram')return buildAnagram(p);
+    if(p.type==='allocation')return buildAlloc(p);
+    return '';
+  }
+
+  // MYTH DRAG
+  function buildMyth(p){
+    const items=shuffle([...p.data.items]);
+    const pool=items.map(it=>`<div class="drag-it" data-id="${it.id}" draggable="true" ondragstart="G._dS(event)" onclick="G._tapMyth(this)">${esc(it.text)}</div>`).join('');
+    return `<div class="card"><div class="ctitle">Tap to select, then tap MYTH or FACT zone below (or drag on desktop)</div>
+      <div class="drag-pool" id="myth-pool">${pool}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><div class="dzone-lbl myth-lbl">MYTH</div>
+      <div class="dzone" id="dz-myth" ondragover="G._dOv(event)" ondrop="G._dDp(event,'myth')" ondragleave="G._dLv(event)"
+        onclick="G._tapDrop('myth')"><span style="font-size:11px;color:var(--textd)">Drop myths here</span></div></div>
+      <div><div class="dzone-lbl fact-lbl">FACT</div>
+      <div class="dzone" id="dz-fact" ondragover="G._dOv(event)" ondrop="G._dDp(event,'fact')" ondragleave="G._dLv(event)"
+        onclick="G._tapDrop('fact')"><span style="font-size:11px;color:var(--textd)">Drop facts here</span></div></div>
+    </div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckMyth()" style="flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px">VERIFY CLASSIFICATION ▶</button>
+      <button class="btn btn-o" onclick="G._rstMyth()" style="flex-shrink:0;padding:11px 16px;font-size:12px">↺ Clear</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _dS(e){_drag=e.target;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move'}
+  function _dOv(e){e.preventDefault();e.currentTarget.classList.add('over')}
+  function _dLv(e){e.currentTarget.classList.remove('over')}
+  function _dDp(e,z){
+    e.preventDefault();e.currentTarget.classList.remove('over');if(!_drag)return;
+    const ph=e.currentTarget.querySelector('span');if(ph)ph.remove();
+    e.currentTarget.appendChild(_drag);_mythPl[_drag.dataset.id]=z;
+    _drag.classList.remove('dragging');_drag=null;
+  }
+  function _tapMyth(el){
+    document.querySelectorAll('.drag-it.tap-sel').forEach(e=>e.classList.remove('tap-sel'));
+    el.classList.add('tap-sel');_tapMythSel=el;
+  }
+  function _tapDrop(z){
+    if(!_tapMythSel)return;
+    const zEl=$('dz-'+z);const ph=zEl.querySelector('span');if(ph)ph.remove();
+    zEl.appendChild(_tapMythSel);_mythPl[_tapMythSel.dataset.id]=z;
+    _tapMythSel.classList.remove('tap-sel');_tapMythSel=null;
+  }
+  function _ckMyth(){
+    const p=curPuz();const ans=p.data.answers;let ok=0;
+    Object.keys(ans).forEach(id=>{if(_mythPl[id]===ans[id])ok++});
+    const tot=Object.keys(ans).length;
+    if(ok===tot)onCorrect();
+    else onWrong(`${ok}/${tot} correct. This puzzle has a MIX of myths and facts — re-read each carefully.`,p.consequence);
+  }
+
+  function _rstMyth(){
+    _mythPl={};_tapMythSel=null;
+    const pool=$('myth-pool');if(!pool)return;
+    ['dz-myth','dz-fact'].forEach(zid=>{
+      const zone=$(zid);if(!zone)return;
+      [...zone.querySelectorAll('.drag-it')].forEach(el=>{
+        el.classList.remove('tap-sel','dragging');
+        pool.appendChild(el);
+      });
+      // Restore placeholder text
+      if(!zone.querySelector('span')){
+        const sp=document.createElement('span');
+        sp.style.cssText='font-size:11px;color:var(--textd)';
+        sp.textContent=zid==='dz-myth'?'Drop myths here':'Drop facts here';
+        zone.appendChild(sp);
+      }
+    });
+  }
+
+  // LOCAL PENALTY — for in-puzzle errors that should NOT navigate away
+  // Use for pyramid/jigsaw placement errors where puzzle should stay open
+  function penalise(msg, secs){
+    secs=secs||30;
+    penalty(secs);
+    const fov=$('flash-ov');
+    if(fov){fov.classList.remove('flash');void fov.offsetWidth;fov.classList.add('flash')}
+    showAlert('WRONG PLACEMENT', msg+'\n\n−'+secs+' seconds. Try again — puzzle stays open.','danger',null);
+  }
+
+  // MCQ
+  function buildMCQ(p){
+    const ctx=p.data.context?`<div class="sc-card"><div class="sc-lbl">Mission Context</div>
+      <div class="sc-grid">${p.data.context.map(c=>`<div class="sc-cell hi">${esc(c.k)}<strong>${esc(c.v)}</strong></div>`).join('')}</div></div>`:'';
+    const opts=shuffle([...p.data.options]).map((o,i)=>`<button class="choice" data-id="${o.id}" data-correct="${o.correct}" onclick="G._selMCQ(this)">
+      <span class="clbl">${String.fromCharCode(65+i)}</span>${esc(o.text)}</button>`).join('');
+    return `${ctx}${opts}<div style="height:70px"></div>${actionBar('G._ckMCQ()','CONFIRM ANSWER')}`;
+  }
+  function _selMCQ(el){document.querySelectorAll('.choice').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');_mcqSel=el}
+  function _ckMCQ(){
+    if(!_mcqSel){showAlert('SELECT AN ANSWER','Choose one of the options first.','info',null);return}
+    if(_mcqSel.dataset.correct==='true'){_mcqSel.classList.add('ok');onCorrect()}
+    else{
+      const badEl=_mcqSel; // snapshot reference before _mcqSel is cleared
+      badEl.classList.add('bad');
+      const p=curPuz();onWrong('Incorrect. Think more carefully about the numbers and percentages.',p.consequence);
+      setTimeout(()=>{badEl.classList.remove('sel','bad','ok');},700);
+      _mcqSel=null;
+    }
+  }
+
+  // MATCHING
+  function buildMatch(p){
+    const lH=p.data.people.map((t,i)=>`<div class="mitem" data-idx="${i}" onclick="G._sL(this,${i})">${esc(t)}</div>`).join('');
+    const rH=p.data.covers.map((t,i)=>`<div class="mitem" data-idx="${i}" onclick="G._sR(this,${i})">${esc(t)}</div>`).join('');
+    return `<div class="match-grid" id="mb"><div id="ml">${lH}</div><div id="mr">${rH}</div></div>
+    <div style="font-size:11px;color:var(--textd);margin-bottom:12px" id="ms-info">Tap a person (left), then tap their most critical missing cover (right).</div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckMatch()" style="flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px">VERIFY MATCHES ▶</button>
+      <button class="btn btn-o" onclick="G._rstMatch()" style="flex-shrink:0;padding:11px 16px;font-size:12px">↺ Clear</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _sL(el,i){
+    if(el.classList.contains('matched'))return;
+    document.querySelectorAll('#ml .mitem').forEach(e=>{if(!e.classList.contains('matched'))e.classList.remove('sel-l')});
+    el.classList.add('sel-l');_selLeft=i;
+  }
+  function _sR(el,i){
+    if(el.classList.contains('matched'))return;
+    if(_selLeft===null){showAlert('SELECT PERSON FIRST','Tap a person on the left side first.','info',null);return}
+    _matchPairs[_selLeft]=i;
+    document.querySelector(`#ml .mitem[data-idx="${_selLeft}"]`)?.classList.replace('sel-l','sel-r');
+    el.classList.add('sel-r');
+    $('ms-info').textContent=`${Object.keys(_matchPairs).length}/6 matched.`;_selLeft=null;
+  }
+  function _ckMatch(){
+    const p=curPuz();let ok=0;
+    Object.entries(p.data.correct).forEach(([k,v])=>{if(_matchPairs[k]==v)ok++});
+    if(ok>=5)onCorrect();
+    else onWrong(`${ok}/6 correct. Match each person to the ONE insurance type they are MOST critically missing.`,p.consequence);
+  }
+
+  function _rstMatch(){
+    _matchPairs={};_selLeft=null;
+    document.querySelectorAll('#ml .mitem,#mr .mitem').forEach(el=>el.classList.remove('sel-l','sel-r','matched'));
+    const info=$('ms-info');if(info)info.textContent='Tap a person (left), then tap their most critical missing cover (right).';
+  }
+
+  // SEQUENCE
+  function buildSeq(p){
+    const tiles=shuffle([...p.data.tiles]);
+    const th=tiles.map(t=>`<div class="tile" data-id="${t.id}" data-order="${t.order}" onclick="G._sT(this)">${esc(t.text)}</div>`).join('');
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px" id="tile-pool">${th}</div>
+    <div class="slbl">Your sequence (tap tiles in order):</div>
+    <div id="seq-d" style="min-height:36px;margin-bottom:70px"></div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckSeq()" style="flex:1;justify-content:center;min-height:50px">SUBMIT SEQUENCE ▶</button>
+      <button class="btn btn-o" onclick="G._rsSeq()" style="flex-shrink:0;padding:11px 16px;font-size:12px">Reset</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _sT(el){
+    if(el.classList.contains('sel'))return;el.classList.add('sel');
+    _seqSel.push({order:parseInt(el.dataset.order),text:el.textContent});
+    const s=document.createElement('div');s.className='seq-step';
+    s.innerHTML=`<span class="seq-n">STEP ${_seqSel.length}</span>${esc(el.textContent)}`;
+    $('seq-d').appendChild(s);
+  }
+  function _rsSeq(){_seqSel=[];document.querySelectorAll('.tile').forEach(t=>t.classList.remove('sel'));$('seq-d').innerHTML=''}
+  function _ckSeq(){
+    const p=curPuz();const total=p.data.tiles.length;
+    if(_seqSel.length!==total){showAlert('INCOMPLETE',`Select all ${total} tiles in order.`,'info',null);return}
+    if(_seqSel.every((s,i)=>s.order===i+1))onCorrect();
+    else{_rsSeq();onWrong('Wrong order. YOU invest first → fund buys units → units accumulate → compounding creates wealth.')}
+  }
+
+  // NUMBER LOCK
+  function buildLock(p){
+    const flds=p.data.fields.map(f=>`<div class="sc-cell ${f.hi?'hi':''}">${esc(f.k)}<strong>${esc(f.v)}</strong></div>`).join('');
+    const digs=Array.from({length:p.data.digits},(_,i)=>`<div class="lock-d" id="ld${i}">_</div>`).join('');
+    return `<div class="sc-card"><div class="sc-lbl">Case Profile — Agent Rajesh</div>
+      <div class="sc-grid">${flds}</div>
+      <div class="fbox">Formula: <strong>${esc(p.data.formula)}</strong></div></div>
+    <div class="lock-disp">${digs}</div>
+    <input type="number" class="linput" id="lock-i" placeholder="Your calculated answer (Lakhs)"
+      oninput="G._uLock(this.value)" style="margin-bottom:70px">
+    ${actionBar('G._ckLock()','UNLOCK')}`;
+  }
+  function _uLock(v){
+    const s=String(v).replace(/\D/g,'').substring(0,3);
+    const p=curPuz();
+    for(let i=0;i<p.data.digits;i++){const el=$('ld'+i);if(el){el.textContent=s[i]||'_';el.className='lock-d'+(s[i]?' act':'')}}
+  }
+  function _ckLock(){
+    const v=($('lock-i')?.value||'').trim();const p=curPuz();
+    if(!v){showAlert('ENTER A VALUE','Type your calculated answer in the field above.','info',null);return}
+    if(v===p.data.answer)onCorrect();
+    else{
+      const entered=parseInt(v,10);const correct=parseInt(p.data.answer,10);
+      const dir=entered<correct?'Your answer is too low. Re-check your multiplication.':'Your answer is too high. Re-check which values you used.';
+      onWrong(`Incorrect. ${dir}\n\nFormula: ${p.data.formula}\nAll data values are in the profile card above.`,p.consequence);
+    }
+  }
+
+  // MULTI SELECT
+  function buildMS(p){
+    const prof=p.data.profile?`<div class="sc-card"><div class="sc-lbl">Financial Profile</div>
+      <div class="sc-grid">${p.data.profile.map(r=>`<div class="sc-cell ${r.cls||''}">${esc(r.k)}<strong>${esc(r.v)}</strong></div>`).join('')}</div></div>`:'';
+    const cnt=p.data.correctCount||p.data.options.filter(o=>o.correct).length;
+    const opts=shuffle([...p.data.options]).map(o=>`<div class="ms" data-id="${o.id}" data-correct="${o.correct}" onclick="G._tMS(this)">
+      <div class="ms-chk" id="mc-${o.id}"></div><div>${esc(o.text)}</div></div>`).join('');
+    return `${prof}<div class="slbl">Select exactly ${cnt} option${cnt>1?'s':''}:</div>${opts}
+    <div style="height:70px"></div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckMS()" style="flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px">SUBMIT ANALYSIS ▶</button>
+      <button class="btn btn-o" onclick="G._rstMS()" style="flex-shrink:0;padding:11px 16px;font-size:12px">↺ Clear</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _tMS(el){
+    if(el.classList.contains('ok')||el.classList.contains('bad'))return;
+    if(_msSel.has(el.dataset.id)){_msSel.delete(el.dataset.id);el.classList.remove('sel');el.querySelector('.ms-chk').textContent=''}
+    else{_msSel.add(el.dataset.id);el.classList.add('sel');el.querySelector('.ms-chk').textContent='✓'}
+  }
+  function _ckMS(){
+    const p=curPuz();const cnt=p.data.correctCount||p.data.options.filter(o=>o.correct).length;
+    if(_msSel.size!==cnt){showAlert(`SELECT EXACTLY ${cnt}`,`Choose exactly ${cnt} option${cnt>1?'s':''}.`,'info',null);return}
+    const sel=[..._msSel];const allOk=sel.every(id=>p.data.options.find(o=>o.id===id)?.correct);
+    if(allOk){sel.forEach(id=>document.querySelector(`.ms[data-id="${id}"]`)?.classList.add('ok'));onCorrect()}
+    else{
+      sel.forEach(id=>{const o=p.data.options.find(x=>x.id===id);document.querySelector(`.ms[data-id="${id}"]`)?.classList.add(o?.correct?'ok':'bad')});
+      onWrong('Some selections are incorrect.',p.consequence);
+      // Use a snapshot of the IDs so the timeout closure doesn't hold live state
+      const snapIds=[...sel];
+      setTimeout(()=>{
+        snapIds.forEach(id=>{const el=document.querySelector(`.ms[data-id="${id}"]`);if(el){el.classList.remove('sel','ok','bad');const c=el.querySelector('.ms-chk');if(c)c.textContent=''}});
+      },800);
+      _msSel.clear();
+    }
+  }
+
+  function _rstMS(){
+    _msSel.clear();
+    document.querySelectorAll('.ms').forEach(el=>{
+      el.classList.remove('sel','ok','bad');
+      const chk=el.querySelector('.ms-chk');if(chk)chk.textContent='';
+    });
+  }
+
+  // PYRAMID
+  function buildPyramid(p){
+    const pool=shuffle([...p.data.items]).map(it=>`<div class="drag-it" data-id="${it.id}" data-level="${it.level}"
+      draggable="true" ondragstart="G._pDS(event)" onclick="G._tapPyr(this)">${esc(it.text)}</div>`).join('');
+    const W=[200,244,288,332,378,424];
+    const labs=['Most risky (TOP)','High risk','Moderate growth','Moderate-low','Low risk','Most stable (BASE)'];
+    let slots='';
+    for(let i=0;i<6;i++){
+      const lv=6-i;
+      slots+=`<div class="pyr-row"><div class="pyr-slot" id="ps${lv}" data-level="${lv}" style="width:${W[i]}px"
+        ondragover="G._pDO(event)" ondrop="G._pDD(event,${lv})" ondragleave="G._pDL(event)"
+        onclick="G._tapPS(${lv})">${esc(labs[i])}</div></div>`;
+    }
+    return `<div class="card"><div class="ctitle">Tap item to select, then tap pyramid level (or drag on desktop)</div>
+      <div class="drag-pool" id="pyr-pool">${pool}</div></div>
+    <div class="card"><div class="pyr-wrap">${slots}</div></div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckPyr()" style="flex:1;justify-content:center;min-height:50px">VERIFY PYRAMID ▶</button>
+      <button class="btn btn-o" onclick="G._clrPyr()" style="flex-shrink:0;padding:11px 16px;font-size:12px">↺ Clear</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _clrPyr(){
+    const pool=$('pyr-pool');if(!pool)return;
+    const labs=['Most risky (TOP)','High risk','Moderate growth','Moderate-low','Low risk','Most stable (BASE)'];
+    for(let i=0;i<6;i++){
+      const lv=6-i;const slot=$('ps'+lv);if(!slot)continue;
+      const item=slot.querySelector('.drag-it');
+      if(item){
+        // Restore item to pool with original sizing
+        item.style.margin='';item.style.width='';
+        item.classList.remove('done','tap-sel','dragging');
+        pool.appendChild(item);
+      }
+      // Restore slot to empty label state
+      slot.textContent=labs[i];
+      slot.classList.remove('filled');
+      slot.setAttribute('ondragover','G._pDO(event)');
+      slot.setAttribute('ondrop',`G._pDD(event,${lv})`);
+      slot.setAttribute('ondragleave','G._pDL(event)');
+      slot.setAttribute('onclick',`G._tapPS(${lv})`);
+    }
+    _tapPyrItem=null;_pyrDrag=null;
+  }
+  function _pDS(e){_pyrDrag=e.target;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move'}
+  function _pDO(e){e.preventDefault();e.currentTarget.classList.add('over')}
+  function _pDL(e){e.currentTarget.classList.remove('over')}
+  function _pDD(e,lv){
+    e.preventDefault();e.currentTarget.classList.remove('over');if(!_pyrDrag)return;
+    const il=parseInt(_pyrDrag.dataset.level);
+    if(il!==lv){penalise('Wrong risk level. Think: PPF=base, Crypto=top.');_pyrDrag.classList.remove('dragging');_pyrDrag=null;return}
+    const slot=$('ps'+lv);
+    // Clear slot label text, move item physically into slot
+    slot.textContent='';
+    slot.classList.add('filled');
+    slot.removeAttribute('ondragover');slot.removeAttribute('ondrop');
+    _pyrDrag.classList.remove('dragging','tap-sel');
+    _pyrDrag.style.margin='0';_pyrDrag.style.width='100%';
+    slot.appendChild(_pyrDrag);
+    _pyrDrag=null;
+  }
+  function _tapPyr(el){
+    document.querySelectorAll('.drag-it.tap-sel').forEach(e=>e.classList.remove('tap-sel'));
+    el.classList.add('tap-sel');_tapPyrItem=el;
+  }
+  function _tapPS(lv){
+    if(!_tapPyrItem)return;
+    const il=parseInt(_tapPyrItem.dataset.level);
+    if(il!==lv){penalise('Wrong level. Select another slot — item stays selected.');_tapPyrItem.classList.remove('tap-sel');_tapPyrItem=null;return}
+    const slot=$('ps'+lv);
+    // Move item physically into slot so ↺ Clear can return it to pool
+    slot.textContent='';
+    slot.classList.add('filled');
+    _tapPyrItem.classList.remove('tap-sel');
+    _tapPyrItem.style.margin='0';_tapPyrItem.style.width='100%';
+    slot.appendChild(_tapPyrItem);
+    _tapPyrItem=null;
+  }
+  function _ckPyr(){
+    let placed=0;
+    for(let lv=1;lv<=6;lv++){const s=$('ps'+lv);if(s&&s.querySelector('.drag-it'))placed++;}
+    if(placed===6)onCorrect();
+    else showAlert('INCOMPLETE',`${placed}/6 placed. Tap an item from the pool, then tap its correct pyramid level.`,'info',null);
+  }
+
+  // JIGSAW
+  function buildJigsaw(p){
+    const pcs=p.data.pieces.map(pc=>`<div class="jpc" data-id="${pc.id}" data-trap="${pc.trap}" id="jp-${pc.id}" onclick="G._jC(this)">${esc(pc.text)}</div>`).join('');
+    return `<div class="slbl" id="jp-lbl">Phase 1: Tap all 6 pieces to reconstruct the policy document</div>
+    <div class="jgrid">${pcs}</div>
+    <div id="jt-h" style="display:none;padding:9px 12px;background:rgba(244,162,97,.06);border:.5px solid rgba(244,162,97,.22);border-radius:var(--rs);font-size:12px;color:var(--amber);margin-top:9px">
+      Policy reconstructed! Now tap the 3 hidden danger clauses.</div>
+    <div style="height:70px"></div>${actionBar('G._ckTraps()','CHECK FOR TRAPS')}`;
+  }
+  function _jC(el){
+    if(_jPhase===1){
+      if(el.classList.contains('placed'))return;
+      el.classList.add('placed');_jPlaced++;
+      if(_jPlaced===6){_jPhase=2;$('jp-lbl').textContent='Phase 2: Tap the 3 hidden danger clauses';$('jt-h').style.display='block'}
+    }else{
+      if(el.dataset.trap==='true'&&!el.classList.contains('trap')){el.classList.add('trap');_traps++}
+      else if(el.dataset.trap==='false'&&!el.classList.contains('placed-ok'))
+        penalise('Not a danger clause. Look for co-payment %, rent caps, and waiting periods.');
+    }
+  }
+  function _ckTraps(){
+    if(_jPhase===1){showAlert('PHASE 1 FIRST','Click all 6 pieces to reconstruct the policy first.','info',null);return}
+    if(_traps===3)onCorrect();
+    else showAlert('NOT YET',`Found ${_traps}/3. Look for: co-payment %, room rent sub-limit, and pre-existing disease waiting period.`,'info',null);
+  }
+
+  // ANAGRAM
+  function buildAnagram(p){
+    const pool=shuffle(p.data.shuffled.map((l,i)=>`<div class="ana-l" data-letter="${l}" data-idx="${i}" onclick="G._pA(this)">${l}</div>`)).join('');
+    const slots=Array.from({length:p.data.word.length},(_,i)=>`<div class="ana-s" data-pos="${i}" onclick="G._rA(this)"></div>`).join('');
+    return `<div class="card"><div class="ctitle">Collected letters (tap to place):</div>
+      <div class="ana-pool" id="ana-pool">${pool}</div></div>
+    <div class="slbl">Arrange the ${p.data.word.length} letters:</div>
+    <div class="ana-ans" id="ana-ans">${slots}</div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckAna()" style="flex:1;justify-content:center;min-height:50px">DECODE CIPHER ▶</button>
+      <button class="btn btn-o" onclick="G._clA()" style="flex-shrink:0;padding:11px 16px;font-size:12px">Clear</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _pA(el){
+    if(el.classList.contains('used'))return;
+    const s=document.querySelector('.ana-s:not(.filled)');if(!s)return;
+    s.textContent=el.dataset.letter;s.classList.add('filled');s.dataset.si=el.dataset.idx;el.classList.add('used');
+  }
+  function _rA(el){
+    if(!el.classList.contains('filled'))return;
+    const src=document.querySelector(`.ana-l[data-idx="${el.dataset.si}"]`);if(src)src.classList.remove('used');
+    el.textContent='';el.classList.remove('filled');el.dataset.si='';
+  }
+  function _clA(){
+    document.querySelectorAll('.ana-s').forEach(s=>{s.textContent='';s.classList.remove('filled');s.dataset.si=''});
+    document.querySelectorAll('.ana-l').forEach(l=>l.classList.remove('used'));
+  }
+  function _ckAna(){
+    const p=curPuz();const w=[...document.querySelectorAll('.ana-s')].map(s=>s.textContent||'').join('');
+    if(w.toUpperCase()===p.data.word)onCorrect();
+    else onWrong(`"${w}" is incorrect. Think: what makes ₹1,000 grow to ₹29,960 over 30 years?`,p.consequence);
+  }
+
+  // ALLOCATION — signature puzzle
+  function buildAlloc(p){
+    const cats=p.data.categories;
+    const total=p.data.total;
+    cats.forEach(c=>{_allocState[c.id]=0}); // init all to 0
+    const rows=cats.map(c=>`
+      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px">${esc(c.name)}</div>
+            <div style="font-size:11px;color:var(--textm)">${esc(c.desc)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <button onclick="G._allocDec('${c.id}')"
+              style="width:48px;height:48px;border:1px solid var(--border2);background:rgba(255,255,255,.04);
+              color:var(--text);border-radius:8px;font-size:22px;cursor:pointer;line-height:1;font-family:var(--font-b)">−</button>
+            <div id="av-${c.id}"
+              style="font-family:var(--font-h);font-size:13px;font-weight:700;color:${c.color};
+              min-width:76px;text-align:center">₹0</div>
+            <button onclick="G._allocInc('${c.id}')"
+              style="width:48px;height:48px;border:1px solid var(--border2);background:rgba(255,255,255,.04);
+              color:var(--text);border-radius:8px;font-size:22px;cursor:pointer;line-height:1;font-family:var(--font-b)">+</button>
+          </div>
+        </div>
+        <div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden">
+          <div id="ab-${c.id}" style="height:100%;width:0%;background:${c.color};border-radius:4px;transition:width .2s ease"></div>
+        </div>
+      </div>`).join('');
+    const fmt=n=>'₹'+n.toLocaleString('en-IN');
+    const lbl=p.data.label||'TOTAL AMOUNT';
+    return `<div class="sc-card" style="margin-bottom:12px">
+      <div class="sc-lbl">${lbl}</div>
+      <div style="font-family:var(--font-h);font-size:26px;color:var(--gold2);text-align:center;padding:6px 0 10px">${fmt(total)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px">
+        <span style="color:var(--textm)">Allocated</span>
+        <span id="alloc-used" style="color:var(--green2);font-family:var(--font-h);font-size:11px">₹0 / ${fmt(total)}</span>
+      </div>
+      <div style="height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden">
+        <div id="alloc-prog" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--gold2));border-radius:5px;transition:width .2s ease"></div>
+      </div>
+    </div>
+    ${rows}
+    <div id="alloc-warn" style="display:none;padding:8px 12px;background:rgba(244,162,97,.08);border:.5px solid rgba(244,162,97,.3);border-radius:var(--rs);font-size:12px;color:var(--amber);margin-bottom:8px">
+      ⚠ Allocate all ${fmt(total)} before submitting.
+    </div>
+    <div style="height:70px"></div>
+    <div class="action-bar">
+      <button class="btn btn-p" onclick="G._ckAlloc()" style="flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px">FINALISE ALLOCATION ▶</button>
+      <button class="btn btn-o" onclick="G._rstAlloc()" style="flex-shrink:0;padding:11px 16px;font-size:12px">↺ Reset</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;
+  }
+  function _allocInc(id){
+    const p=curPuz();const step=p.data.step||5000;const total=p.data.total;
+    const used=Object.values(_allocState).reduce((a,b)=>a+b,0);
+    if(used+step>total)return;
+    _allocState[id]=(_allocState[id]||0)+step;
+    _updateAllocUI(p);
+  }
+  function _allocDec(id){
+    const p=curPuz();const step=p.data.step||5000;
+    _allocState[id]=Math.max(0,(_allocState[id]||0)-step);
+    _updateAllocUI(p);
+  }
+  function _updateAllocUI(p){
+    const total=p.data.total;
+    const used=Object.values(_allocState).reduce((a,b)=>a+b,0);
+    p.data.categories.forEach(c=>{
+      const v=_allocState[c.id]||0;
+      const el=$('av-'+c.id);if(el)el.textContent='₹'+v.toLocaleString('en-IN');
+      const bar=$('ab-'+c.id);if(bar)bar.style.width=(v/total*100)+'%';
+    });
+    const prog=$('alloc-prog');if(prog)prog.style.width=(used/total*100)+'%';
+    const usedEl=$('alloc-used');
+    if(usedEl)usedEl.textContent=`₹${used.toLocaleString('en-IN')} / ₹${total.toLocaleString('en-IN')}`;
+    usedEl&&(usedEl.style.color=used===total?'var(--green2)':'var(--amber)');
+    const warn=$('alloc-warn');if(warn)warn.style.display='none';
+  }
+  function _ckAlloc(){
+    const p=curPuz();
+    const total=p.data.total;
+    const used=Object.values(_allocState).reduce((a,b)=>a+b,0);
+    if(used!==total){
+      const warn=$('alloc-warn');if(warn)warn.style.display='block';
+      showAlert('ALLOCATE ALL FUNDS',
+        `You've placed ₹${used.toLocaleString('en-IN')} of ₹${total.toLocaleString('en-IN')}. Use + buttons to allocate the remaining ₹${(total-used).toLocaleString('en-IN')}.`,'info',null);
+      return;
+    }
+    const bad=[];
+    p.data.categories.forEach(c=>{
+      const v=_allocState[c.id]||0;
+      const lo=c.correct[0],hi=c.correct[1];
+      if(v<lo)bad.push(`${c.name.replace(/^\S+ /,'')} — too little allocated`);
+      else if(v>hi)bad.push(`${c.name.replace(/^\S+ /,'')} — too much allocated`);
+    });
+    if(!bad.length)onCorrect();
+    else onWrong(`Allocation needs adjustment:\n${bad.join('\n')}\n\nThink about the correct financial priority order.`,p.consequence);
+  }
+
+  function _rstAlloc(){
+    const p=curPuz();if(!p)return;
+    p.data.categories.forEach(c=>{_allocState[c.id]=0});
+    _updateAllocUI(p);
+  }
+  function showResults(timeout){
+    stopTimer();clearAtmShake();document.body.className='';$('hud').classList.remove('on');
+    const success=solved>=10&&!timeout;
+    const tSec=900-sLeft,m=Math.floor(tSec/60),s=tSec%60;
+    const acc=wrongs===0?100:Math.round(solved/(solved+wrongs)*100);
+    const band=acc>=90&&solved>=13?'Financial Strategist':solved>=10||acc>=70?'Smart Planner':'Emerging Learner';
+    const bandColor=band==='Financial Strategist'?'var(--gold2)':band==='Smart Planner'?'var(--green2)':'var(--teal)';
+    // Dynamic profile based on actual puzzle performance across all 5 pillars
+    const isC=id=>statuses[id]==='correct';
+    const insScore=[1,3,5,6,8].filter(isC).length;
+    const budgetScore=[2,13].filter(isC).length;
+    const invScore=[7,9,14].filter(isC).length;
+    const mfScore=[4,11].filter(isC).length;
+    const goalScore=isC(12)?1:0;
+    const estateScore=isC(15)?1:0;
+    const creditScore=isC(10)?1:0;
+    const strong=[],weak=[];
+    if(insScore>=4)strong.push('Insurance & Protection');else if(insScore<=1)weak.push('Insurance & Protection');
+    if(budgetScore>=2)strong.push('Budgeting & Cash Flow');else weak.push('Budgeting & Cash Flow');
+    if(invScore>=2)strong.push('Investing & Rebalancing');else if(invScore===0)weak.push('Investing & Rebalancing');
+    if(mfScore>=2)strong.push('Mutual Fund Strategy');else weak.push('Mutual Fund Strategy');
+    if(goalScore===1)strong.push('Goal-Based Investing');else weak.push('Goal-Based Investing');
+    if(estateScore===1)strong.push('Estate & Documentation');else weak.push('Estate & Documentation');
+    if(creditScore===1)strong.push('Credit Management');
+    let profile;
+    if(solved>=14&&acc>=88)profile='Certified Financial Thinker — outstanding across all 5 pillars. You have the knowledge to build and protect generational wealth. Share this with your family.';
+    else if(strong.length>=5)profile='Complete financial awareness — all five pillars covered. You have a solid foundation. The next step is implementation.';
+    else if(weak.includes('Estate & Documentation'))profile='Strong investor, critical blind spot in estate planning. Every rupee you build can be frozen in legal disputes without a Will and proper nominations. Fix this first.';
+    else if(strong.length>=3)profile=`Solid in ${strong.slice(0,3).join(', ')}. Next focus: ${weak.slice(0,2).join(' and ')}.`;
+    else profile='Building awareness. Start with the basics: emergency fund → term + health insurance → index fund SIP. Those three alone put you ahead of 80% of Indians.';
+    const wrongPuz=BANK.filter(p=>statuses[p.id]==='wrong');
+    const wrongHTML=wrongPuz.length?wrongPuz.map(p=>`<div class="mi-item"><div class="mi-name">${esc(p.title)}</div><div class="mi-txt">${esc(p.mistake)}</div></div>`).join('')
+      :'<p style="font-size:12px;color:var(--textm)">No mistakes recorded — outstanding!</p>';
+    const lessH=BANK.map((p,i)=>`<div class="lesson-item"><div class="lnum">${String(i+1).padStart(2,'0')}</div>
+      <div class="lbody"><div class="lname">${esc(p.title)}<span style="font-weight:400;color:var(--textd);font-size:10px"> — ${esc(p.topic)}</span></div>${esc(p.learned)}</div></div>`).join('');
+    $('results-page').innerHTML=`
+      <div class="rh">
+        <div class="mv-logo">★ MONEY VICHARA ★</div>
+        <div class="rtitle ${success?'success':'fail'}">${success?'MISSION COMPLETE ✓':'MISSION INCOMPLETE'}</div>
+        <div class="rsub">${success?'Financial Freedom Blueprint secured. Well done, Agent.':'Time expired — every concept you encountered stays with you.'}</div>
+      </div>
+      <div class="stats-g">
+        <div class="stat-b"><div class="sv g">${solved}/${BANK.length}</div><div class="slb">Puzzles Solved</div></div>
+        <div class="stat-b"><div class="sv gd">${m}m ${s}s</div><div class="slb">Time Used</div></div>
+        <div class="stat-b"><div class="sv ${acc>=80?'g':acc>=60?'gd':'r'}">${acc}%</div><div class="slb">Accuracy</div></div>
+      </div>
+      <div class="profile-card">
+        <div class="ptitle2">PERFORMANCE PROFILE</div>
+        <div class="pband" style="color:${bandColor}">${band}</div>
+        <div class="pdesc">${esc(profile)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <div style="background:rgba(26,173,78,.06);border:.5px solid rgba(26,173,78,.2);border-radius:8px;padding:10px">
+            <div style="font-family:var(--font-h);font-size:8px;color:var(--green2);letter-spacing:2px;margin-bottom:7px">STRONG AREAS</div>
+            ${strong.length?strong.map(s=>`<div style="font-size:11px;color:#a8ffce;margin-bottom:4px">✓ ${esc(s)}</div>`).join(''):'<div style="font-size:11px;color:var(--textd)">Keep studying!</div>'}
+          </div>
+          <div style="background:rgba(230,57,70,.05);border:.5px solid rgba(230,57,70,.18);border-radius:8px;padding:10px">
+            <div style="font-family:var(--font-h);font-size:8px;color:var(--red2);letter-spacing:2px;margin-bottom:7px">FOCUS AREAS</div>
+            ${weak.length?weak.map(w=>`<div style="font-size:11px;color:#f4a8ae;margin-bottom:4px">⚠ ${esc(w)}</div>`).join(''):'<div style="font-size:11px;color:var(--textd)">No major gaps!</div>'}
+          </div>
+        </div>
+      </div>
+      ${success?`<div class="card cert-section">
+        <div class="ctitle">Your Certificate</div>
+        <div id="cert-preview-wrap"><canvas id="cert-r" style="width:100%;display:block;border-radius:8px"></canvas></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px">
+          <button class="btn btn-p" onclick="G.dlCert()">⬇ DOWNLOAD CERTIFICATE</button>
+          <button class="btn btn-o" onclick="G.resetGame()">↺ PLAY AGAIN</button>
+        </div></div>`
+      :`<div style="text-align:center;margin-bottom:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="G.resetGame()">↺ PLAY AGAIN</button>
+        </div>`}
+      <div class="card"><div class="ctitle">⚠ Mistakes & Key Gaps</div>${wrongHTML}</div>
+      <div class="card" style="margin-bottom:80px"><div class="ctitle">💡 ${BANK.length} Financial Concepts Unlocked</div>${lessH}</div>
+      <div style="text-align:center;padding:18px;background:rgba(201,162,39,.05);border:.5px solid var(--border);border-radius:var(--r);margin-bottom:80px">
+        <div style="font-family:var(--font-h);font-size:10px;color:var(--gold);letter-spacing:3px;margin-bottom:6px">MONEY VICHARA</div>
+        <div style="font-size:13px;color:var(--textm);line-height:1.8">Financial freedom is not about how much you earn —<br>it is about how wisely you plan.</div>
+        <div style="font-size:10px;color:var(--textd);margin-top:8px">Designed by Vishweshwar Mensumane</div>
+        <div style="font-size:10px;color:var(--textd);margin-top:5px;line-height:1.6">⚠ For educational purposes only. Not financial advice.<br>Consult a SEBI-registered financial advisor before making investment decisions.</div>
+      </div>`;
+    showScreen('s-results');
+    if(success){
+      // Wait for Google Fonts (Poppins/Orbitron) before drawing canvas — prevents blank text
+      const doDraw=()=>drawCert('cert-r',band,acc);
+      if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>setTimeout(doDraw,300));}
+      else{setTimeout(doDraw,800);}
+      launchConfetti();
+    }
+  }
+
+  // CERTIFICATE — premium canvas design
+  function drawCert(cid,band,accScore){
+    const canvas=$(cid)||$('cert-c');
+    if(!canvas){setTimeout(()=>drawCert(cid,band,accScore),400);return;} // retry once if DOM not ready
+    const W=900,H=636;canvas.width=W;canvas.height=H;canvas.style.display='block';
+    const ctx=canvas.getContext('2d');
+    // Dark green bg
+    ctx.fillStyle='#030f08';ctx.fillRect(0,0,W,H);
+    // Subtle texture overlay
+    for(let y=0;y<H;y+=4){ctx.fillStyle=`rgba(26,173,78,${.01+(y/H)*.02})`;ctx.fillRect(0,y,W,2)}
+    // Outer gold border
+    ctx.strokeStyle='#c9a227';ctx.lineWidth=3;ctx.strokeRect(12,12,W-24,H-24);
+    // Inner thin border
+    ctx.strokeStyle='rgba(201,162,39,.3)';ctx.lineWidth=1;ctx.strokeRect(20,20,W-40,H-40);
+    // Gold top bar gradient
+    const topGr=ctx.createLinearGradient(0,0,W,0);
+    topGr.addColorStop(0,'transparent');topGr.addColorStop(.3,'rgba(201,162,39,.8)');topGr.addColorStop(.7,'rgba(201,162,39,.8)');topGr.addColorStop(1,'transparent');
+    ctx.fillStyle=topGr;ctx.fillRect(0,36,W,2);ctx.fillRect(0,H-38,W,2);
+    // Corner ornaments
+    const corner=(x,y,dx,dy)=>{
+      ctx.strokeStyle='rgba(201,162,39,.6)';ctx.lineWidth=2;ctx.beginPath();
+      ctx.moveTo(x,y+dy*24);ctx.lineTo(x,y);ctx.lineTo(x+dx*24,y);ctx.stroke();
+      ctx.beginPath();ctx.arc(x+dx*8,y+dy*8,4,0,Math.PI*2);
+      ctx.fillStyle='rgba(201,162,39,.4)';ctx.fill();
+    };
+    corner(32,32,1,1);corner(W-32,32,-1,1);corner(32,H-32,1,-1);corner(W-32,H-32,-1,-1);
+    // Big MV watermark
+    ctx.save();ctx.globalAlpha=.06;ctx.fillStyle='#c9a227';
+    ctx.font='bold 110px Orbitron,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('MV',W/2,H/2+10);ctx.restore();
+    // Logo
+    ctx.fillStyle='#c9a227';ctx.font='bold 14px Orbitron,monospace';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    ctx.fillText('★  MONEY VICHARA  ★',W/2,80);
+    // Subtitle
+    ctx.fillStyle='rgba(201,162,39,.5)';ctx.font='11px Poppins,sans-serif';
+    ctx.fillText('CERTIFICATE OF COMPLETION',W/2,110);
+    // Main title
+    ctx.fillStyle='#e0f0e8';ctx.font='bold 27px Orbitron,monospace';
+    ctx.fillText('MISSION: FINANCIAL FREEDOM',W/2,168);
+    // Divider line
+    ctx.strokeStyle='rgba(201,162,39,.4)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(180,190);ctx.lineTo(W-180,190);ctx.stroke();
+    // "This certifies"
+    ctx.fillStyle='rgba(224,240,232,.55)';ctx.font='13px Poppins,sans-serif';
+    ctx.fillText('This certifies that',W/2,224);
+    // PLAYER NAME — big and prominent
+    ctx.fillStyle='#e8c14a';ctx.font='bold 42px Poppins,sans-serif';
+    ctx.fillText(pName,W/2,282);
+    // Name underline
+    const nw=ctx.measureText(pName).width;
+    ctx.strokeStyle='rgba(232,193,74,.5)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(W/2-nw/2,294);ctx.lineTo(W/2+nw/2,294);ctx.stroke();
+    // Body line
+    ctx.fillStyle='rgba(224,240,232,.65)';ctx.font='13px Poppins,sans-serif';
+    ctx.fillText('has successfully completed the Personal Finance Escape Room',W/2,330);
+    // Performance Band — coloured
+    const bColor=band==='Financial Strategist'?'#e8c14a':band==='Smart Planner'?'#22d460':'#52b788';
+    ctx.fillStyle=bColor;ctx.font='bold 20px Poppins,sans-serif';
+    ctx.fillText(band,W/2,368);
+    // Stats row
+    ctx.fillStyle='rgba(201,162,39,.7)';ctx.font='bold 12px Poppins,sans-serif';
+    const tSec=900-sLeft,mm=Math.floor(tSec/60),ss=tSec%60;
+    ctx.fillText(`Puzzles Solved: ${solved}/${BANK.length}  ·  Accuracy: ${accScore||'--'}%  ·  Time: ${mm}m ${ss}s`,W/2,402);
+    const now=new Date();
+    const dateStr=now.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    const timeStr=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    ctx.fillStyle='rgba(224,240,232,.4)';ctx.font='11px Poppins,sans-serif';
+    ctx.fillText(`${dateStr}  ·  ${timeStr}`,W/2,432);
+    // Bottom divider
+    ctx.strokeStyle='rgba(201,162,39,.28)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(80,H-62);ctx.lineTo(W-80,H-62);ctx.stroke();
+    // Footer
+    ctx.fillStyle='rgba(201,162,39,.55)';ctx.font='10px Orbitron,monospace';
+    ctx.fillText('MONEY VICHARA  ·  Designed by Vishweshwar Mensumane',W/2,H-40);
+  }
+
+  function dlCert(){
+    const canvas=$('cert-r')||$('cert-c');
+    const acc2=wrongs===0?100:Math.round(solved/(solved+wrongs)*100);
+    const band=acc2>=90&&solved>=13?'Financial Strategist':solved>=10||acc2>=70?'Smart Planner':'Emerging Learner';
+    drawCert(canvas.id,band,acc2);
+    const a=document.createElement('a');
+    a.download=`MFF_${pName.replace(/\s+/g,'_')}_Certificate.png`;
+    a.href=canvas.toDataURL('image/png');a.click();
+  }
+
+  function launchConfetti(){
+    const C=['#c9a227','#e8c14a','#1aad4e','#22d460','#52b788','#fff5c2','#ff9f43','#52e8ff','#ff6b74'];
+    for(let i=0;i<140;i++)setTimeout(()=>{
+      const e=document.createElement('div');
+      const size=5+Math.random()*9;
+      const isCircle=Math.random()>.4;
+      e.style.cssText=`position:fixed;width:${size}px;height:${size}px;
+        border-radius:${isCircle?'50%':Math.random()>0.5?'2px':'0'};
+        pointer-events:none;z-index:9999;
+        left:${10+Math.random()*80}vw;top:-14px;
+        background:${C[Math.floor(Math.random()*C.length)]};
+        transform:rotate(${Math.random()*360}deg);
+        animation:confettiFall ${1.6+Math.random()*2.8}s ease-in forwards;
+        animation-delay:${Math.random()*0.6}s`;
+      document.body.appendChild(e);setTimeout(()=>e.remove(),6000);
+    },i*14);
+  }
+
+  function resetGame(){
+    stopTimer();clearAtmShake();document.body.className='';$('hud').classList.remove('on');
+    // Reset flash and dim overlays
+    const fov=$('flash-ov');if(fov){fov.classList.remove('flash')}
+    // Reset hint pips
+    for(let i=0;i<4;i++){const p=$('hp'+i);if(p){p.style.background='var(--gold)';p.style.boxShadow='0 0 5px var(--gold)'}}
+    $('hint-btn').disabled=false;
+    showScreen('s-intro');
+  }
+
+  // Drag cleanup
+  document.addEventListener('dragend',()=>{
+    document.querySelectorAll('.dragging').forEach(e=>e.classList.remove('dragging'));
+    document.querySelectorAll('.over').forEach(e=>e.classList.remove('over'));
+  });
+
+  return{startGame,skipPuzzle,useHint,closeAlert,dismissLearn,dlCert,showResults,resetGame,
+    _dS,_dOv,_dLv,_dDp,_tapMyth,_tapDrop,_ckMyth,_rstMyth,
+    _selMCQ:_selMCQ=>(_mcqSel=_selMCQ),_selMCQ,_ckMCQ,
+    _sL,_sR,_ckMatch,_rstMatch,_sT,_rsSeq,_ckSeq,_uLock,_ckLock,
+    _tMS,_ckMS,_rstMS,_pDS,_pDO,_pDL,_pDD,_tapPyr,_tapPS,_ckPyr,_clrPyr,
+    _jC,_ckTraps,_pA,_rA,_clA,_ckAna,
+    _allocInc,_allocDec,_ckAlloc,_rstAlloc};
+})();
+</script>
+</body>
+</html>
