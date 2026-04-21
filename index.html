@@ -512,7 +512,6 @@ body.o2danger #o2dim{background:rgba(0,4,18,.45);animation:dimPulse 1.2s ease-in
 .choice{font-size:15px!important;padding:14px 15px!important}
 .ms{font-size:14px!important;padding:13px 14px!important}
 .drag-it{font-size:14px!important}
-.drag-it.done{display:none!important}
 .drag-it.tap-sel{outline:2px solid var(--gold);background:rgba(201,162,39,.18)!important;box-shadow:0 0 0 3px rgba(201,162,39,.25)}
 .mitem{font-size:13px!important}
 .ltxt{font-size:13px!important;line-height:1.7!important}
@@ -694,6 +693,19 @@ body.o2danger #o2dim{background:rgba(0,4,18,.45);animation:dimPulse 1.2s ease-in
 // ============================================================
 // PUZZLE BANK
 // ============================================================
+// Pre-load fonts for canvas certificate rendering
+(function preloadFonts(){
+  if(!window.FontFace)return;
+  const fonts=[
+    {name:'Poppins',url:'https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2'},
+    {name:'Orbitron',url:'https://fonts.gstatic.com/s/orbitron/v31/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nyGy6BoWgz.woff2'}
+  ];
+  fonts.forEach(({name,url})=>{
+    const ff=new FontFace(name,`url(${url})`);
+    ff.load().then(f=>document.fonts.add(f)).catch(()=>{});
+  });
+})();
+
 const BANK = [
   {
     id:1,title:'True or False: Finance Edition',topic:'Insurance & Savings Myths',type:'myth-drag',
@@ -1106,6 +1118,7 @@ const G = (function(){
   }
 
   function checkEnd(){
+    _navigating=false; // always reset before any end-state branching
     if(solved>=10){triggerEscape();return}
     const rem=BANK.filter(p=>statuses[p.id]==='wrong'||statuses[p.id]==='skipped');
     if(!rem.length){stopTimer();showResults(false);return}
@@ -1117,22 +1130,25 @@ const G = (function(){
   }
 
   function onCorrect(){
-    if(_navigating)return; // guard against double-submit
+    if(_navigating)return;
     const p=curPuz();
     if(scoredIds.has(p.id)){_navigating=true;showLearnReveal(p,()=>goToNextPuzzle());return}
     _navigating=true;
     scoredIds.add(p.id);statuses[p.id]='correct';solved++;updateHUD();
-    // Celebration burst — immediate feedback before learn overlay
-    const C=['#22d460','#52e8ff','#c9a227','#fff5c2','#e8c14a'];
-    for(let i=0;i<32;i++)setTimeout(()=>{
-      const e=document.createElement('div');const sz=4+Math.random()*7;
+    // Celebration burst — visible ABOVE learn overlay (z-index 10001)
+    const C=['#22d460','#52e8ff','#c9a227','#e8c14a','#fff5c2','#ff9f43'];
+    for(let i=0;i<60;i++)setTimeout(()=>{
+      const e=document.createElement('div');
+      const sz=6+Math.random()*10;
+      const isCircle=Math.random()>.4;
       e.style.cssText=`position:fixed;width:${sz}px;height:${sz}px;
-        border-radius:${Math.random()>.5?'50%':'2px'};pointer-events:none;z-index:9999;
-        left:${25+Math.random()*50}vw;top:35%;
+        border-radius:${isCircle?'50%':'3px'};pointer-events:none;z-index:10001;
+        left:${15+Math.random()*70}vw;top:20%;
         background:${C[Math.floor(Math.random()*C.length)]};
-        animation:confettiFall ${0.9+Math.random()*1.4}s ease-out forwards`;
-      document.body.appendChild(e);setTimeout(()=>e.remove(),3000);
-    },i*18);
+        transform:rotate(${Math.random()*360}deg);
+        animation:confettiFall ${1.0+Math.random()*1.8}s ease-out forwards`;
+      document.body.appendChild(e);setTimeout(()=>e.remove(),3500);
+    },i*15);
     showLearnReveal(p,()=>goToNextPuzzle());
   }
 
@@ -1363,15 +1379,26 @@ const G = (function(){
     showAlert('WRONG PLACEMENT', msg+'\n\n−'+secs+' seconds. Try again — puzzle stays open.','danger',null);
   }
 
-  // MCQ
   function buildMCQ(p){
-    const ctx=p.data.context?`<div class="sc-card"><div class="sc-lbl">Mission Context</div>
+    const ctx2=p.data.context?`<div class="sc-card"><div class="sc-lbl">Mission Context</div>
       <div class="sc-grid">${p.data.context.map(c=>`<div class="sc-cell hi">${esc(c.k)}<strong>${esc(c.v)}</strong></div>`).join('')}</div></div>`:'';
     const opts=shuffle([...p.data.options]).map((o,i)=>`<button class="choice" data-id="${o.id}" data-correct="${o.correct}" onclick="G._selMCQ(this)">
       <span class="clbl">${String.fromCharCode(65+i)}</span>${esc(o.text)}</button>`).join('');
-    return `${ctx}${opts}<div style="height:70px"></div>${actionBar('G._ckMCQ()','CONFIRM ANSWER')}`;
+    return `${ctx2}${opts}
+    <div style="height:70px"></div>
+    <div class="action-bar">
+      <button class="btn btn-p" id="mcq-confirm-btn" onclick="G._ckMCQ()"
+        style="flex:1;justify-content:center;font-size:14px;padding:13px;min-height:50px;opacity:.45;cursor:default"
+        disabled>SELECT AN OPTION ABOVE ↑</button>
+      <button class="btn btn-skip" onclick="G.skipPuzzle()">Skip −30s</button>
+    </div>`;}
+  function _selMCQ(el){
+    document.querySelectorAll('.choice').forEach(b=>b.classList.remove('sel'));
+    el.classList.add('sel');_mcqSel=el;
+    // Activate confirm button
+    const btn=$('mcq-confirm-btn');
+    if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='CONFIRM ANSWER ▶';}
   }
-  function _selMCQ(el){document.querySelectorAll('.choice').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');_mcqSel=el}
   function _ckMCQ(){
     if(!_mcqSel){showAlert('SELECT AN ANSWER','Choose one of the options first.','info',null);return}
     if(_mcqSel.dataset.correct==='true'){_mcqSel.classList.add('ok');onCorrect()}
@@ -1552,13 +1579,11 @@ const G = (function(){
       const lv=6-i;const slot=$('ps'+lv);if(!slot)continue;
       const item=slot.querySelector('.drag-it');
       if(item){
-        // Restore item to pool with original sizing
-        item.style.margin='';item.style.width='';
+        item.style.cssText=''; // clear all inline styles set during placement
         item.classList.remove('done','tap-sel','dragging');
         pool.appendChild(item);
       }
-      // Restore slot to empty label state
-      slot.textContent=labs[i];
+      slot.innerHTML=labs[i]; // restore label text (item already moved out)
       slot.classList.remove('filled');
       slot.setAttribute('ondragover','G._pDO(event)');
       slot.setAttribute('ondrop',`G._pDD(event,${lv})`);
@@ -1853,11 +1878,16 @@ const G = (function(){
       </div>`;
     showScreen('s-results');
     if(success){
-      // Wait for Google Fonts (Poppins/Orbitron) before drawing canvas — prevents blank text
-      const doDraw=()=>drawCert('cert-r',band,acc);
-      if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>setTimeout(doDraw,300));}
-      else{setTimeout(doDraw,800);}
       launchConfetti();
+      // Explicitly load both fonts before drawing canvas — CDN fonts may not be in document.fonts
+      const fontPromises=[];
+      if(window.FontFace){
+        fontPromises.push(
+          document.fonts.load('bold 42px Poppins').catch(()=>{}),
+          document.fonts.load('bold 14px Orbitron').catch(()=>{})
+        );
+      }
+      Promise.all(fontPromises).then(()=>setTimeout(()=>drawCert('cert-r',band,acc),250));
     }
   }
 
@@ -1939,12 +1969,24 @@ const G = (function(){
 
   function dlCert(){
     const canvas=$('cert-r')||$('cert-c');
+    if(!canvas){showAlert('NOT READY','Complete the game first to generate your certificate.','info',null);return;}
     const acc2=wrongs===0?100:Math.round(solved/(solved+wrongs)*100);
     const band=acc2>=90&&solved>=13?'Financial Strategist':solved>=10||acc2>=70?'Smart Planner':'Emerging Learner';
-    drawCert(canvas.id,band,acc2);
-    const a=document.createElement('a');
-    a.download=`MFF_${pName.replace(/\s+/g,'_')}_Certificate.png`;
-    a.href=canvas.toDataURL('image/png');a.click();
+    const doDownload=()=>{
+      drawCert(canvas.id,band,acc2);
+      setTimeout(()=>{
+        const a=document.createElement('a');
+        a.download=`MFF_${(pName||'Agent').replace(/\s+/g,'_')}_Certificate.png`;
+        a.href=canvas.toDataURL('image/png');
+        document.body.appendChild(a);a.click();document.body.removeChild(a);
+      },100); // small delay so canvas paint completes
+    };
+    if(window.FontFace){
+      Promise.all([
+        document.fonts.load('bold 42px Poppins').catch(()=>{}),
+        document.fonts.load('bold 14px Orbitron').catch(()=>{})
+      ]).then(doDownload);
+    } else { doDownload(); }
   }
 
   function launchConfetti(){
@@ -1967,9 +2009,8 @@ const G = (function(){
 
   function resetGame(){
     stopTimer();clearAtmShake();document.body.className='';$('hud').classList.remove('on');
-    // Reset flash and dim overlays
+    _navigating=false; // clear any navigation lock from previous game
     const fov=$('flash-ov');if(fov){fov.classList.remove('flash')}
-    // Reset hint pips
     for(let i=0;i<4;i++){const p=$('hp'+i);if(p){p.style.background='var(--gold)';p.style.boxShadow='0 0 5px var(--gold)'}}
     $('hint-btn').disabled=false;
     showScreen('s-intro');
